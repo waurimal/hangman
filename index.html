@@ -50,7 +50,7 @@ body {
   margin-top: 1rem; /* 앱 컨테이너 위쪽 마진 */
 }
 
-/* 넓은 화면용(게임창, 결과창)을 가로로 더 길게 확장 (800px -> 950px) */
+/* 넓은 화면용(게임창, 결과창, 대시보드)을 가로로 더 길게 확장 (800px -> 950px) */
 #app.wide-mode { max-width: 950px; padding-top: 1.5rem; }
 
 /* 푸터 (제작자 정보) */
@@ -92,17 +92,20 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .form-group input:focus, .form-group select:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
 .form-group input.upper { text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center; }
 
-.mode-grid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; max-width: 400px; margin: 0 auto; flex: 1; align-content: center;}
+/* 모드 선택 카드 레이아웃 (반응형 2x2 그리드) */
+.mode-grid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; max-width: 450px; margin: 0 auto; flex: 1; align-content: center;}
+@media(min-width: 480px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
+
 .mode-card {
   background: #ffffff; border: 2px solid transparent; border-radius: var(--border-radius-lg); padding: 1.2rem 1rem;
   cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-md);
-  display: flex; align-items: center; gap: 15px; text-align: left;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px;
 }
 .mode-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
-.mode-card .icon { font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+.mode-card .icon { font-size: 36px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
 .mode-card .text-wrap { flex: 1; }
-.mode-card .label { font-size: 16px; font-weight: 700; color: var(--color-text-primary); }
-.mode-card .desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500;}
+.mode-card .label { font-size: 15px; font-weight: 800; color: var(--color-text-primary); }
+.mode-card .desc { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500;}
 
 .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 2rem; overflow-y: auto; padding-bottom: 10px;}
 .unit-btn { background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); padding: 1rem; cursor: pointer; text-align: left; font-size: 14px; font-weight: 600; color: var(--color-text-primary); transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; }
@@ -154,13 +157,13 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 
 .result-overlay { display: none; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; border-radius: var(--border-radius-lg); }
 .result-overlay.show { display: flex; animation: fadeIn 0.3s forwards; }
-.result-card { background: #ffffff; border-radius: var(--border-radius-lg); padding: 2.5rem 2rem; text-align: center; max-width: 320px; width: 90%; box-shadow: var(--shadow-float); transform: scale(0.9); animation: popIn 0.4s 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+.result-card { background: #ffffff; border-radius: var(--border-radius-lg); padding: 2.5rem 2rem; text-align: center; max-width: 340px; width: 90%; box-shadow: var(--shadow-float); transform: scale(0.9); animation: popIn 0.4s 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 .result-emoji { font-size: 48px; margin-bottom: 10px; animation: bounce 1s infinite; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 .result-word { font-size: 24px; font-weight: 800; color: var(--primary); margin: 10px 0; letter-spacing: 2px; }
-.result-msg { font-size: 15px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 20px; }
+.result-msg { font-size: 15px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.4; }
 
 /* 튕김 방지 배너 */
 .rejoin-banner {
@@ -246,6 +249,13 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
             <div class="desc">초대 코드를 입력하고 입장하세요</div>
           </div>
         </div>
+        <div class="mode-card" onclick="ui.showStudentLeaderboard()" style="border-color: #f59e0b; background: #fffbeb;">
+          <div class="icon">🏆</div>
+          <div class="text-wrap">
+            <div class="label" style="color: #b45309;">명예의 전당 (순위)</div>
+            <div class="desc">친구들의 최고 기록과 랭킹</div>
+          </div>
+        </div>
       </div>
       
       <!-- 교사 모드 버튼 -->
@@ -288,8 +298,8 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
         <div class="form-group">
           <label>멀티플레이 모드</label>
           <select id="host-multi-type" onchange="ui.toggleHostMode()">
-            <option value="team">팀 대항전 (다수결/팀이름 사용)</option>
-            <option value="1v1">1:1 개인전 (학생 정보 필수)</option>
+            <option value="team">팀 대항전 (단어 맞추기 성공 횟수 경쟁)</option>
+            <option value="1v1">1:1 개인전 (타임어택 보너스 점수 경쟁)</option>
           </select>
         </div>
         
@@ -413,10 +423,10 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 7. 게임 현황 대시보드 (교사용) -->
+  <!-- 7. 교사용 게임 현황 대시보드 (기존 로그) -->
   <div id="screen-results" class="screen">
-    <h1>학생 게임 결과 기록표</h1>
-    <p class="subtitle" style="margin-bottom: 15px;">모든 개인전 및 1:1 대전 결과가 표시됩니다.</p>
+    <h1>학생 게임 결과 기록표 (교사용)</h1>
+    <p class="subtitle" style="margin-bottom: 15px;">매 라운드별 상세한 결과가 표시됩니다.</p>
     
     <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
       <button class="btn-ghost" onclick="ui.goHome()">← 홈으로</button>
@@ -443,6 +453,34 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       </table>
     </div>
   </div>
+  
+  <!-- 8. 학생용 명예의 전당 (리더보드) -->
+  <div id="screen-leaderboard" class="screen">
+    <h1>🏆 명예의 전당</h1>
+    <p class="subtitle" style="margin-bottom: 15px; color: var(--primary);">가장 높고 빠른 점수를 기록한 친구들은 누구일까요?</p>
+    
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+      <button class="btn-ghost" onclick="ui.goHome()">← 홈으로</button>
+    </div>
+    
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>순위</th>
+            <th>점수 (타임보너스 포함)</th>
+            <th>이름 (소속 팀)</th>
+            <th>도전 단원</th>
+            <th>진행 모드</th>
+            <th>달성일</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-tbody">
+          <tr><td colspan="6" style="text-align:center; padding:30px;">명예의 전당 기록을 불러오는 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px;"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
   <!-- 교사 암호 입력 팝업 -->
   <div class="result-overlay" id="pwd-overlay">
@@ -464,6 +502,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <div id="sheet-save-status" style="font-size:12px; font-weight:600; color:var(--primary); margin-bottom:12px; min-height:16px;"></div>
       
       <button class="btn-primary" onclick="game.nextRound()" id="next-btn" style="margin-bottom: 10px;">다음 단어 →</button>
+      <button class="btn-primary" onclick="ui.showStudentLeaderboard()" id="leaderboard-btn" style="display:none; margin-bottom: 10px; background: linear-gradient(to right, #f59e0b, #d97706);">🏆 명예의 전당 확인하기</button>
       <div id="waiting-next-msg" style="display:none; font-size:13px; font-weight:600; color:var(--primary); margin-bottom:15px;">상대방이 다음 라운드를 준비 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px;"></div></div>
       
       <button class="btn-ghost" onclick="ui.exitGame()">게임 완전히 끝내기</button>
@@ -486,7 +525,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   </div>
   
   <div style="margin-bottom: 15px;">
-    <button class="panel-btn sec" onclick="ui.showResults()"><span style="font-size:14px; margin-right:4px;">📊</span> 학생 결과 현황 및 다운로드</button>
+    <button class="panel-btn sec" onclick="ui.showResults()"><span style="font-size:14px; margin-right:4px;">📊</span> 학생 라운드별 상세 로그 다운로드</button>
   </div>
   
   <div style="border-top: 1px solid var(--color-border); margin: 15px 0;"></div>
@@ -517,8 +556,9 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const MAX_DEFAULT = 6;
+const TEACHER_PWD = "0000"; // 기본 교사 모드 암호
 
-// 설정 객체 (teacherPwd 추가)
+// 설정 객체
 let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [], teacherPwd: '0000' };
 
 function getActiveUnits() {
@@ -533,11 +573,13 @@ let state = {
   sync: {
     status: 'waiting', multiType: 'team', teams: ['', ''], scores: [0, 0],
     currentTeam: 0, unit: -1, wordPool: [], usedWords: [], current: {w:'', h:''}, 
-    guessed: [], wrong: 0, roundNum: 0, maxWrong: 6, hintMode: 'korean'
+    guessed: [], wrong: 0, roundNum: 0, maxWrong: 6, hintMode: 'korean',
+    lastEarned: 0 // 이번 라운드에 획득한 보너스 점수 동기화
   },
   student: { grade: '', cls: '', num: '', name: '' },
   guestTempRoomType: null,
-  startTime: null
+  startTime: null,
+  scoreSaved: false // 명예의전당 중복 저장 방지 플래그
 };
 
 // --- Firebase 초기화 ---
@@ -689,7 +731,7 @@ const net = {
       
       state.guestTempRoomType = roomData.multiType;
       
-      const infoMsg = roomData.multiType === 'team' ? "팀 대항전 모드입니다. 팀 이름을 정해주세요!" : "1:1 개인전 모드입니다. 학생 정보를 입력하세요!";
+      const infoMsg = roomData.multiType === 'team' ? "팀 대항전 모드입니다. 팀 이름을 정해주세요!" : "1:1 개인전(타임어택) 모드입니다. 학생 정보를 입력하세요!";
       document.getElementById('guest-room-info').textContent = infoMsg;
       
       document.getElementById('guest-team-input').style.display = roomData.multiType === 'team' ? 'block' : 'none';
@@ -823,6 +865,7 @@ const game = {
     state.sync.roundNum = 0;
     state.sync.scores = [0, 0];
     state.sync.currentTeam = 0;
+    state.scoreSaved = false; // 새 게임 시작시 명예의 전당 저장 초기화
     
     ui.showScreen('screen-game');
     await game.initNextRound();
@@ -841,6 +884,7 @@ const game = {
     state.sync.current = pick;
     state.sync.guessed = [];
     state.sync.wrong = 0;
+    state.sync.lastEarned = 0;
     state.sync.roundNum++;
     state.sync.status = 'playing';
     
@@ -869,12 +913,14 @@ const game = {
   updateHeader: () => {
     let metaText = '';
     if (state.isMulti) {
+      let is1v1 = (state.sync.multiType === '1v1');
+      let scoreLabel = is1v1 ? '점' : '번 성공';
       metaText = `방코드: ${state.roomId} | 라운드: ${state.sync.roundNum}/${state.sync.wordPool.length}`;
       document.getElementById('score-section').style.display = 'grid';
       document.getElementById('score-name-0').textContent = state.sync.teams[0];
       document.getElementById('score-name-1').textContent = state.sync.teams[1];
-      document.getElementById('score-num-0').textContent = state.sync.scores[0];
-      document.getElementById('score-num-1').textContent = state.sync.scores[1];
+      document.getElementById('score-num-0').textContent = state.sync.scores[0] + (is1v1 ? '' : '');
+      document.getElementById('score-num-1').textContent = state.sync.scores[1] + (is1v1 ? '' : '');
       
       document.getElementById('score-card-0').className = 'score-card' + (state.sync.currentTeam === 0 ? ' active-team' : '');
       document.getElementById('score-card-1').className = 'score-card' + (state.sync.currentTeam === 1 ? ' active-team' : '');
@@ -890,7 +936,7 @@ const game = {
       }
     } else {
       const s = state.student;
-      metaText = `${s.grade}학년 ${s.cls}반 ${s.name} | ${state.sync.roundNum}/${state.sync.wordPool.length}`;
+      metaText = `${s.grade}학년 ${s.cls}반 ${s.name} | 라운드: ${state.sync.roundNum}/${state.sync.wordPool.length} | 점수: ${state.sync.scores[0]}점`;
       document.getElementById('score-section').style.display = 'none';
       document.getElementById('turn-badge').style.display = 'none';
     }
@@ -970,8 +1016,23 @@ const game = {
     
     if (inWord) {
       game.renderWord(); game.renderAlpha();
+      
       if (state.sync.current.w.split('').every(c => c === ' ' || state.sync.guessed.includes(c))) {
-        if (state.isMulti) state.sync.scores[state.sync.currentTeam]++;
+        // 단어를 모두 맞춘 경우 (타임 어택 보너스 계산)
+        const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+        let earned = 0;
+        
+        // 개인전 또는 1:1 모드일 때 보너스 점수 지급
+        if (state.mode === 'solo' || state.sync.multiType === '1v1') {
+            earned = 100 + Math.max(100 - (elapsed * 2), 0); // 100점 기본 + 빨리 맞출수록 최대 100점 가점
+        } else {
+            earned = 1; // 일반 팀전은 1개 성공으로 카운트
+        }
+        state.sync.lastEarned = earned;
+
+        if (state.isMulti) state.sync.scores[state.sync.currentTeam] += earned;
+        else state.sync.scores[0] += earned;
+
         state.sync.status = 'result';
         if (state.isMulti) await net.pushState(); else game.showResultUI(true);
       } else {
@@ -995,13 +1056,23 @@ const game = {
     document.getElementById('result-emoji').textContent = won ? '🎉' : '😢';
     document.getElementById('result-word').textContent = state.sync.current.w.toUpperCase();
     
+    const elapsed = Math.round((Date.now() - state.startTime) / 1000);
     let msg = won ? (state.isMulti ? `${state.sync.teams[state.sync.currentTeam]}이(가) 맞혔어요!` : '정답이에요! 훌륭합니다.') : '아쉬워요. 다음 기회를 노려보세요!';
-    document.getElementById('result-msg').textContent = msg;
+    
+    // 점수 획득 알림 추가
+    if (won && (state.mode === 'solo' || state.sync.multiType === '1v1')) {
+        msg += `<br><span style="color:var(--primary); font-size:13px;">(⏱️ ${elapsed}초 만에 성공! <b>+${state.sync.lastEarned}점</b>)</span>`;
+    }
+    document.getElementById('result-msg').innerHTML = msg;
     
     const remaining = state.sync.wordPool.filter(w => !state.sync.usedWords.includes(w.w)).length;
     const nextBtn = document.getElementById('next-btn');
     const waitingMsg = document.getElementById('waiting-next-msg');
+    const leaderboardBtn = document.getElementById('leaderboard-btn');
     
+    // 최종 라운드 버튼 토글
+    leaderboardBtn.style.display = 'none';
+
     if (state.isMulti) {
       if (state.mode === 'host') { 
         nextBtn.style.display = 'block';
@@ -1020,13 +1091,11 @@ const game = {
     
     document.getElementById('result-overlay').classList.add('show');
     
-    const elapsed = Math.round((Date.now() - state.startTime) / 1000);
     const statusEl = document.getElementById('sheet-save-status');
-    
     if (!state.isMulti || state.mode === 'host') {
       statusEl.textContent = '클라우드에 결과 기록 중...';
       settings.logResultToCloud(state.sync.current.w, won, state.sync.wrong, elapsed)
-        .then(() => { statusEl.textContent = '✓ 선생님 기록판에 자동 저장됨'; })
+        .then(() => { statusEl.textContent = '✓ 라운드 자동 저장됨'; })
         .catch(() => { statusEl.textContent = '⚠ 기록 전송에 실패했습니다'; });
     } else {
        statusEl.textContent = '호스트가 결과를 기록 중입니다.';
@@ -1039,25 +1108,33 @@ const game = {
     await game.initNextRound();
   },
   
-  showFinalResultUI: () => {
+  showFinalResultUI: async () => {
     document.getElementById('result-overlay').classList.add('show');
     document.getElementById('result-emoji').textContent = '🏁';
     document.getElementById('result-word').textContent = '게임 종료!';
     
     let msg = '';
     if (state.isMulti) {
-       if(state.sync.scores[0] > state.sync.scores[1]) msg = `🏆 ${state.sync.teams[0]} 최종 우승! (${state.sync.scores[0]}:${state.sync.scores[1]})`;
-       else if(state.sync.scores[1] > state.sync.scores[0]) msg = `🏆 ${state.sync.teams[1]} 최종 우승! (${state.sync.scores[1]}:${state.sync.scores[0]})`;
-       else msg = `🤝 ${state.sync.scores[0]}:${state.sync.scores[1]} 동점! 무승부입니다.`;
+       if(state.sync.scores[0] > state.sync.scores[1]) msg = `🏆 ${state.sync.teams[0]} 최종 승리! (${state.sync.scores[0]} : ${state.sync.scores[1]})`;
+       else if(state.sync.scores[1] > state.sync.scores[0]) msg = `🏆 ${state.sync.teams[1]} 최종 승리! (${state.sync.scores[1]} : ${state.sync.scores[0]})`;
+       else msg = `🤝 ${state.sync.scores[0]} : ${state.sync.scores[1]} 동점! 무승부입니다.`;
     } else {
        const s = state.student;
-       msg = `수고하셨습니다! ${s.grade}학년 ${s.cls}반 ${s.name} 학생의 게임이 끝났습니다.`;
+       msg = `수고하셨습니다! ${s.name} 학생, 총 <b>${state.sync.scores[0]}점</b>을 획득했습니다!`;
     }
     
-    document.getElementById('result-msg').textContent = msg;
+    document.getElementById('result-msg').innerHTML = msg;
     document.getElementById('next-btn').style.display = 'none';
     document.getElementById('waiting-next-msg').style.display = 'none';
-    document.getElementById('sheet-save-status').textContent = '';
+    document.getElementById('sheet-save-status').textContent = '최종 점수를 명예의 전당에 등록 중...';
+    
+    // 최종 점수를 학생용 명예의 전당에 저장 (호스트가 멀티 양쪽 다 저장해주거나, 각자 자신의 기기에서 저장)
+    await settings.saveLeaderboardScore();
+    document.getElementById('sheet-save-status').textContent = '✓ 명예의 전당에 점수 기록 완료!';
+    
+    // 명예의 전당 보기 버튼 활성화
+    document.getElementById('leaderboard-btn').style.display = 'block';
+
     ui.clearRejoin(false); 
   }
 };
@@ -1069,7 +1146,7 @@ const ui = {
     document.getElementById(id).classList.add('active'); 
     
     // 게임 화면 및 결과 화면은 가로 레이아웃(wide-mode) 활성화
-    if (id === 'screen-results' || id === 'screen-game') document.getElementById('app').classList.add('wide-mode');
+    if (id === 'screen-results' || id === 'screen-game' || id === 'screen-leaderboard') document.getElementById('app').classList.add('wide-mode');
     else document.getElementById('app').classList.remove('wide-mode');
   },
   
@@ -1099,8 +1176,9 @@ const ui = {
     ui.showScreen('screen-home');
   },
   
-  exitGame: () => {
-    if (confirm("정말 게임에서 나가시겠습니까? 진행 상황이 사라질 수 있습니다.")) {
+  exitGame: async () => {
+    if (confirm("정말 게임에서 나가시겠습니까? (현재까지 획득한 점수가 명예의 전당에 기록됩니다.)")) {
+       await settings.saveLeaderboardScore();
        ui.clearRejoin(true);
        ui.goHome();
     }
@@ -1160,6 +1238,43 @@ const ui = {
   clearRejoin: (hideBanner) => { sessionStorage.removeItem('hm_rejoin'); if (hideBanner) document.getElementById('rejoin-banner').style.display = 'none'; },
   checkRejoin: () => { if (sessionStorage.getItem('hm_rejoin')) { document.getElementById('rejoin-banner').style.display = 'flex'; } },
 
+  // 학생용 명예의 전당 UI
+  showStudentLeaderboard: async () => {
+    ui.goHome(); // 초기화 후 화면 변경
+    ui.showScreen('screen-leaderboard');
+    
+    const tbody = document.getElementById('leaderboard-tbody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px;">기록을 불러오는 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px; vertical-align:middle;"></div></td></tr>';
+    
+    const results = await settings.fetchLeaderboardData();
+    
+    if (results.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--color-text-secondary);">아직 등록된 명예의 전당 기록이 없습니다.</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = '';
+    results.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      
+      let rankIcon = (idx + 1) + '위';
+      if (idx === 0) rankIcon = '🥇 1위';
+      else if (idx === 1) rankIcon = '🥈 2위';
+      else if (idx === 2) rankIcon = '🥉 3위';
+
+      tr.innerHTML = `
+        <td style="font-weight:800; color:var(--primary); font-size:14px;">${rankIcon}</td>
+        <td style="font-weight:800; font-size:15px; color:#d97706;">${r.score}점</td>
+        <td style="font-weight:600;">${r.player}</td>
+        <td style="color:var(--color-text-secondary);">${r.unit}</td>
+        <td><span style="font-size:11px; padding:3px 8px; border-radius:6px; background:#f1f5f9; color:var(--color-text-secondary);">${r.mode}</span></td>
+        <td style="font-size:11px; color:var(--color-text-secondary);">${r.dateString}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  },
+
+  // 교사용 라운드 기록표
   showResults: async () => {
     document.getElementById('teacher-panel').classList.remove('open');
     ui.showScreen('screen-results');
@@ -1170,7 +1285,7 @@ const ui = {
     const results = await settings.fetchResults();
     
     if (results.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--color-text-secondary);">아직 저장된 게임 기록이 없습니다.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--color-text-secondary);">아직 저장된 라운드 기록이 없습니다.</td></tr>';
       return;
     }
     
@@ -1283,10 +1398,67 @@ const settings = {
     }
   },
 
+  // 라운드별 상세 로깅을 위한 Reference
   getResultsRef: () => {
      return !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_results') : collection(db, 'hangman_results');
   },
+
+  // 명예의 전당(총점) 저장을 위한 Reference
+  getLeaderboardRef: () => {
+     return !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_leaderboard') : collection(db, 'hangman_leaderboard');
+  },
   
+  // 최종 점수 명예의 전당 저장 (학생/개인전)
+  saveLeaderboardScore: async () => {
+    if (!db || state.scoreSaved) return; // 중복 저장 방지
+    if (state.mode === 'guest' && state.sync.multiType === 'team') return; // 팀전 게스트는 저장 생략 (필요에 따라 호스트만)
+
+    let myScore = state.isMulti ? state.sync.scores[state.myTeamIdx] : state.sync.scores[0];
+    if (myScore <= 0) return; // 0점 이하는 명예의 전당 제외
+
+    let unitTitle = state.sync.unit !== -1 && getActiveUnits()[state.sync.unit] ? getActiveUnits()[state.sync.unit].title : "전체 단어 섞기";
+    let playerName = "";
+    let modeName = state.mode;
+
+    if (state.isMulti && state.sync.multiType === 'team') {
+       playerName = state.sync.teams[state.myTeamIdx];
+       modeName = "팀 대항전";
+    } else if (state.isMulti && state.sync.multiType === '1v1') {
+       playerName = state.sync.teams[state.myTeamIdx];
+       modeName = "1:1 개인전";
+    } else {
+       playerName = `${state.student.grade}학년 ${state.student.cls}반 ${state.student.name}`;
+       modeName = "개인전(솔로)";
+    }
+
+    state.scoreSaved = true;
+    try {
+       await addDoc(settings.getLeaderboardRef(), {
+          timestamp: Date.now(),
+          dateString: new Date().toLocaleString(),
+          mode: modeName,
+          unit: unitTitle,
+          player: playerName,
+          score: myScore
+       });
+    } catch(e) { console.error("명예의 전당 저장 실패", e); }
+  },
+
+  fetchLeaderboardData: async () => {
+    if (!db) return [];
+    try {
+      const snap = await getDocs(settings.getLeaderboardRef());
+      let results = [];
+      snap.forEach(doc => results.push(doc.data()));
+      // 명예의 전당은 점수(score) 내림차순 정렬
+      results.sort((a,b) => b.score - a.score); 
+      return results;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  },
+
   logResultToCloud: async (word, correct, wrongCount, elapsed) => {
     if (!db) return;
     
@@ -1363,7 +1535,7 @@ const settings = {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `행맨_게임결과_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `행맨_상세결과_${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

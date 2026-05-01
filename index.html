@@ -1564,7 +1564,7 @@ window.settings.logResultToCloud = async (w, c, wr, e) => {
     let modeName = state.mode.includes('team') ? '단체전' : (state.mode.includes('1v1') ? '1:1 개인전' : '1인 플레이');
     let p = "";
     if (state.isMulti && state.sync.multiType === 'team') {
-        p = `[팀전] ${state.sync.teams.filter(t=>t).join(' vs ')}`;
+        p = state.sync.teams[state.sync.currentTeam] || "알 수 없는 팀";
     } else if (state.isMulti && state.sync.multiType === '1v1') {
         p = state.sync.teams[state.sync.currentTeam] + " (진행자)";
     } else {

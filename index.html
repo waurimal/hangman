@@ -480,13 +480,22 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <!-- 8. 학생용 명예의 전당 (리더보드) -->
   <div id="screen-leaderboard" class="screen">
     <h1>🏆 명예의 전당</h1>
-    <p class="subtitle" style="margin-bottom: 15px; color: var(--primary);">단원별 최고 점수와 랭킹을 확인하세요!</p>
+    <p class="subtitle" style="margin-bottom: 15px; color: var(--primary);">단원별/모드별 최고 점수와 랭킹을 확인하세요!</p>
     
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center; gap: 10px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center; gap: 10px; flex-wrap:wrap;">
       <button class="btn-ghost" onclick="ui.goHome()" style="flex-shrink:0;">← 홈으로</button>
-      <select id="lb-unit-select" class="panel-select" style="max-width: 300px; padding: 0.5rem; font-weight:600;" onchange="ui.updateLeaderboardTable()">
-         <!-- 자바스크립트에서 동적 채움 -->
-      </select>
+      
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <select id="lb-mode-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="ui.updateLeaderboardTable()">
+          <option value="전체 모드">모든 게임 모드</option>
+          <option value="1인 플레이">1인 플레이</option>
+          <option value="1:1 개인전">1:1 개인전</option>
+          <option value="단체전">단체전</option>
+        </select>
+        <select id="lb-unit-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="ui.updateLeaderboardTable()">
+           <!-- 자바스크립트에서 동적 채움 -->
+        </select>
+      </div>
     </div>
     
     <div class="table-wrap">
@@ -1357,7 +1366,7 @@ window.ui.saveRejoinData = () => { sessionStorage.setItem('hm_rejoin', JSON.stri
 window.ui.clearRejoin = (hideBanner) => { sessionStorage.removeItem('hm_rejoin'); if (hideBanner) document.getElementById('rejoin-banner').style.display = 'none'; };
 window.ui.checkRejoin = () => { if (sessionStorage.getItem('hm_rejoin')) { document.getElementById('rejoin-banner').style.display = 'flex'; } };
 
-// 명예의 전당 캐시 및 UI 렌더링 로직 (학년/반 필터 포함)
+// 명예의 전당 캐시 및 UI 렌더링 로직 (단원 및 모드 필터, 학년/반 등수 포함)
 window.ui.cachedLeaderboardData = [];
 window.ui.showStudentLeaderboard = async () => {
     ui.goHome(); // 초기화 후 화면 변경
@@ -1372,6 +1381,8 @@ window.ui.showStudentLeaderboard = async () => {
        unitSelect.appendChild(opt);
     });
     
+    document.getElementById('lb-mode-select').value = '전체 모드'; // 팝업 열 때 모드 초기화
+
     document.getElementById('leaderboard-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">기록을 불러오는 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px; vertical-align:middle;"></div></td></tr>';
     
     ui.cachedLeaderboardData = await settings.fetchLeaderboardData();
@@ -1380,14 +1391,21 @@ window.ui.showStudentLeaderboard = async () => {
 
 window.ui.updateLeaderboardTable = () => {
     const selectedUnit = document.getElementById('lb-unit-select').value;
+    const selectedMode = document.getElementById('lb-mode-select').value;
     const tbody = document.getElementById('leaderboard-tbody');
     
-    // 단원 필터링 및 점수 내림차순 정렬
-    let filtered = ui.cachedLeaderboardData.filter(r => r.unit === selectedUnit);
+    // 단원 및 진행 모드 필터링 후 점수 내림차순 정렬
+    let filtered = ui.cachedLeaderboardData.filter(r => {
+        let match = (r.unit === selectedUnit);
+        if (selectedMode !== '전체 모드') {
+            match = match && (r.mode === selectedMode);
+        }
+        return match;
+    });
     filtered.sort((a, b) => b.score - a.score);
     
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--color-text-secondary);">해당 단원에 등록된 명예의 전당 기록이 없습니다.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--color-text-secondary);">해당 조건에 등록된 명예의 전당 기록이 없습니다.</td></tr>';
       return;
     }
 
@@ -1650,13 +1668,13 @@ const settings = {
     let playerName = "알 수 없음";
 
     if (state.isMulti && state.sync.multiType === 'team') {
-       modeName = "멀티 팀 대항전";
+       modeName = "단체전";
        playerName = `[팀전] ${state.sync.teams.filter(t=>t).join(' vs ')}`;
     } else if (state.isMulti && state.sync.multiType === '1v1') {
-       modeName = "멀티 1:1 개인전";
+       modeName = "1:1 개인전";
        playerName = state.sync.teams[state.sync.currentTeam] + " (진행자)";
     } else {
-       modeName = "솔로 모드";
+       modeName = "1인 플레이";
        const s = state.student;
        playerName = `${s.grade}학년 ${s.cls}반 ${s.num}번 ${s.name}`;
     }
@@ -1718,7 +1736,17 @@ const settings = {
   }
 };
 
+// 암호 입력 모달 엔터키 이벤트 바인딩
+document.getElementById('teacher-pwd').addEventListener('keypress', function(e) {
+  if(e.key === 'Enter') settings.checkPassword();
+});
+
 // --- 초기화 ---
+window.ui = ui;
+window.net = net;
+window.game = game;
+window.settings = settings;
+
 settings.loadLocal();
 ui.renderUnits();
 </script>

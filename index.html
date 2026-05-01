@@ -397,27 +397,52 @@ let state = {
 
 // --- Firebase 초기화 ---
 let app, auth, db, user, appId, unsubscribeRoom = null;
+let isExternalEnv = false; // 깃허브 외부 호스팅 여부 체크
 
 const initFirebase = async () => {
   try {
     if (typeof __firebase_config !== 'undefined' && typeof __app_id !== 'undefined') {
+      // 1. 제미나이 내부 환경일 경우
       appId = __app_id;
       app = initializeApp(JSON.parse(__firebase_config));
-      auth = getAuth(app);
-      db = getFirestore(app);
+    } else {
+      // 2. 깃허브 등 외부 호스팅 환경일 경우
+      isExternalEnv = true;
       
-      let userCredential;
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        userCredential = await signInAnonymously(auth);
+      // 🔥 [중요] 깃허브에서 멀티플레이를 하려면 아래 설정값을 본인의 Firebase 설정으로 바꿔야 합니다!
+      // 본인의 Firebase 콘솔에서 발급받은 firebaseConfig 내용을 아래에 덮어쓰세요.
+      const myFirebaseConfig = {
+        apiKey: "AIzaSyCcfTj1TqWJm4jsVcp67EjshDsJJombWKY",
+        authDomain: "hangman-e4a7b.firebaseapp.com",
+        projectId: "hangman-e4a7b",
+        storageBucket: "hangman-e4a7b.firebasestorage.app",
+        messagingSenderId: "434551215608",
+        appId: "1:434551215608:web:89ff7a794553676128320d",
+        measurementId: "G-WLZ3T4WWN0"
+      };
+
+      if (myFirebaseConfig.apiKey === "YOUR_API_KEY") {
+        console.warn("개인 Firebase 설정이 입력되지 않아 멀티플레이 방을 생성할 수 없습니다.");
+        return; 
       }
       
-      user = userCredential.user;
-      onAuthStateChanged(auth, u => { user = u || user; });
-    } else {
-      console.warn("Firebase 환경 변수가 없습니다. 멀티플레이가 작동하지 않을 수 있습니다.");
+      appId = 'github-hosted-app';
+      app = initializeApp(myFirebaseConfig);
     }
+    
+    auth = getAuth(app);
+    db = getFirestore(app);
+    
+    let userCredential;
+    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+      userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+    } else {
+      // 외부 환경에서는 익명 로그인 사용
+      userCredential = await signInAnonymously(auth);
+    }
+    
+    user = userCredential.user;
+    onAuthStateChanged(auth, u => { user = u || user; });
   } catch(e) {
     console.error("Firebase 초기화 에러:", e);
   }
@@ -426,7 +451,14 @@ initFirebase();
 
 // --- 네트워크(Firebase Firestore) 로직 ---
 const net = {
-  getRoomRef: (roomId) => doc(db, 'artifacts', appId, 'public', 'data', 'hangman_rooms', roomId),
+  getRoomRef: (roomId) => {
+    // 제미나이 환경이면 지정된 복잡한 경로, 깃허브 환경이면 단순한 루트 컬렉션 사용
+    if (!isExternalEnv) {
+      return doc(db, 'artifacts', appId, 'public', 'data', 'hangman_rooms', roomId);
+    } else {
+      return doc(db, 'hangman_rooms', roomId);
+    }
+  },
   
   createRoom: async () => {
     if (!user) return alert("네트워크 연결을 확인 중입니다. 잠시 후 시도해주세요.");

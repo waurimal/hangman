@@ -42,7 +42,7 @@ body {
 }
 
 #app {
-  width: 100%; max-width: 500px; min-height: 550px; background: var(--bg-card);
+  width: 100%; max-width: 600px; min-height: 550px; background: var(--bg-card);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.6); border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-float); padding: 2rem 1.5rem; position: relative;
@@ -50,7 +50,7 @@ body {
   margin-top: 1rem; /* 앱 컨테이너 위쪽 마진 */
 }
 
-/* 넓은 화면용(게임창, 결과창, 대시보드)을 가로로 더 길게 확장 (800px -> 950px) */
+/* 넓은 화면용(게임창, 결과창, 대시보드)을 가로로 더 길게 확장 */
 #app.wide-mode { max-width: 950px; padding-top: 1.5rem; }
 
 /* 푸터 (제작자 정보) */
@@ -92,9 +92,13 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .form-group input:focus, .form-group select:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
 .form-group input.upper { text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center; }
 
-/* 모드 선택 카드 레이아웃 (반응형 2x2 그리드) */
-.mode-grid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; max-width: 450px; margin: 0 auto; flex: 1; align-content: center;}
-@media(min-width: 480px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
+/* 메인 화면 1열, 2열 분리 그리드 */
+.home-top-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 600px; margin: 0 auto; }
+.home-bottom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 600px; margin: 12px auto 0; }
+@media (max-width: 550px) {
+  .home-top-grid { grid-template-columns: 1fr; }
+  .home-bottom-grid { grid-template-columns: 1fr; }
+}
 
 .mode-card {
   background: #ffffff; border: 2px solid transparent; border-radius: var(--border-radius-lg); padding: 1.2rem 1rem;
@@ -121,7 +125,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .turn-badge.my-turn { background: var(--success); color: white; animation: pulse 2s infinite; }
 .turn-badge.wait-turn { background: #f1f5f9; color: var(--color-text-secondary); }
 
-/* 게임 가로 레이아웃 설정 (더 넓게 조정) */
+/* 게임 가로 레이아웃 설정 */
 .game-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; margin-bottom: 1rem;}
 @media (max-width: 650px) {
   .game-layout { grid-template-columns: 1fr; gap: 20px; }
@@ -149,11 +153,12 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .alpha-btn.wrong { background: #f1f5f9; color: var(--color-text-tertiary); border-color: #e2e8f0; box-shadow: none; transform: translateY(4px); opacity: 0.7; }
 .alpha-btn:disabled { cursor: default; }
 
-.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1.5rem; }
+/* 반응형 다중 팀 점수판 그리드 (최대 10팀 수용) */
+.score-grid { display: grid; gap: 12px; margin-bottom: 1.5rem; justify-content: center; }
 .score-card { background: #ffffff; border-radius: var(--border-radius-md); padding: 1rem; text-align: center; border: 2px solid transparent; box-shadow: var(--shadow-sm); transition: 0.3s; }
-.score-card .team-name { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 4px; }
-.score-card .score-num { font-size: 32px; font-weight: 800; color: var(--color-text-primary); line-height: 1; }
-.score-card.active-team { border-color: var(--primary); background: #f5f3ff; transform: scale(1.02); box-shadow: var(--shadow-md); }
+.score-card .team-name { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 4px; word-break: break-all; }
+.score-card .score-num { font-size: 28px; font-weight: 800; color: var(--color-text-primary); line-height: 1; }
+.score-card.active-team { border-color: var(--primary); background: #f5f3ff; transform: scale(1.05); box-shadow: var(--shadow-md); z-index: 10; }
 
 .result-overlay { display: none; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; border-radius: var(--border-radius-lg); }
 .result-overlay.show { display: flex; animation: fadeIn 0.3s forwards; }
@@ -223,37 +228,49 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       </div>
     </div>
     
-    <div style="margin: 0;">
+    <div style="margin: 0; width: 100%;">
       <h1 style="font-family: monospace; font-size: 30px;">WORD HANGMAN RACE</h1>
       <p class="subtitle" style="font-size: 16px; color: var(--primary);">영어 단어 행맨 게임</p>
       
-      <div class="mode-grid" style="margin-top: 2rem;">
+      <!-- [1열] 게임 모드 선택 -->
+      <div class="home-top-grid" style="margin-top: 2rem;">
         <div class="mode-card" onclick="ui.selectMode('solo')">
           <div class="icon">🎮</div>
           <div class="text-wrap">
             <div class="label">1인 플레이</div>
-            <div class="desc">혼자서 단어 맞추기 연습</div>
+            <div class="desc">혼자서 연습하기</div>
           </div>
         </div>
-        <div class="mode-card" onclick="ui.selectMode('host')">
-          <div class="icon">🏠</div>
+        <div class="mode-card" onclick="ui.selectMode('host_1v1')">
+          <div class="icon">⚔️</div>
           <div class="text-wrap">
-            <div class="label">방 만들기 (호스트)</div>
-            <div class="desc">방을 만들고 친구를 초대하세요</div>
+            <div class="label">개인전</div>
+            <div class="desc">1:1 타임어택 (방만들기)</div>
           </div>
         </div>
+        <div class="mode-card" onclick="ui.selectMode('host_team')">
+          <div class="icon">👨‍👩‍👧‍👦</div>
+          <div class="text-wrap">
+            <div class="label">단체전</div>
+            <div class="desc">2~10팀 대항 (방만들기)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- [2열] 방 참가 및 명예의 전당 -->
+      <div class="home-bottom-grid">
         <div class="mode-card" onclick="ui.selectMode('guest')">
           <div class="icon">🚀</div>
           <div class="text-wrap">
-            <div class="label">방 참가하기 (게스트)</div>
-            <div class="desc">초대 코드를 입력하고 입장하세요</div>
+            <div class="label">방 참가하기</div>
+            <div class="desc">초대 코드로 게임 입장</div>
           </div>
         </div>
         <div class="mode-card" onclick="ui.showStudentLeaderboard()" style="border-color: #f59e0b; background: #fffbeb;">
           <div class="icon">🏆</div>
           <div class="text-wrap">
-            <div class="label" style="color: #b45309;">명예의 전당 (순위)</div>
-            <div class="desc">친구들의 최고 기록과 랭킹</div>
+            <div class="label" style="color: #b45309;">명예의 전당</div>
+            <div class="desc">최고 기록과 랭킹 순위</div>
           </div>
         </div>
       </div>
@@ -292,21 +309,24 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <!-- 3. 호스트 - 방 만들기 -->
   <div id="screen-host-setup" class="screen">
     <div style="margin: auto 0;">
-      <h1>멀티플레이 방 만들기</h1>
+      <h1 id="host-mode-title">멀티플레이 방 만들기</h1>
       <p class="subtitle">게임 모드와 참가 정보를 설정하세요</p>
       <div class="room-card">
-        <div class="form-group">
-          <label>멀티플레이 모드</label>
-          <select id="host-multi-type" onchange="ui.toggleHostMode()">
-            <option value="team">팀 대항전 (단어 맞추기 성공 횟수 경쟁)</option>
-            <option value="1v1">1:1 개인전 (타임어택 보너스 점수 경쟁)</option>
+        
+        <!-- 단체전 팀 수 선택 (단체전일때만 보임) -->
+        <div class="form-group" id="host-team-count-wrap" style="display:none;">
+          <label>참가할 총 팀 수 (최대 10팀)</label>
+          <select id="host-team-count">
+            <option value="2">2팀</option><option value="3">3팀</option><option value="4">4팀</option>
+            <option value="5">5팀</option><option value="6">6팀</option><option value="7">7팀</option>
+            <option value="8">8팀</option><option value="9">9팀</option><option value="10">10팀</option>
           </select>
         </div>
-        
+
         <div id="host-team-input">
           <div class="form-group">
             <label>우리 팀 이름 (호스트)</label>
-            <input id="host-team-name" type="text" value="블루팀" maxlength="12"/>
+            <input id="host-team-name" type="text" value="팀 1" maxlength="12"/>
           </div>
         </div>
         
@@ -356,7 +376,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
           <div id="guest-team-input" style="display:none;">
             <div class="form-group">
               <label>우리 팀 이름 (게스트)</label>
-              <input id="guest-team-name" type="text" value="레드팀" maxlength="12"/>
+              <input id="guest-team-name" type="text" value="참가팀" maxlength="12"/>
             </div>
           </div>
           
@@ -378,7 +398,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
         
         <div id="guest-waiting-area" style="display:none; text-align:center; margin-top:10px;">
           <div style="font-size:14px; color:var(--success); font-weight:700; margin-bottom:10px;">✓ 방 입장 성공!</div>
-          <div style="font-size:13px; color:var(--primary); font-weight:600;">호스트가 게임을 시작할 때까지 대기해주세요...</div>
+          <div style="font-size:13px; color:var(--primary); font-weight:600;">모든 인원이 모이고 호스트가 시작할 때까지 대기해주세요...</div>
           <div class="loader"></div>
         </div>
       </div>
@@ -402,12 +422,9 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <div class="turn-badge" id="turn-badge"></div>
     </div>
     
-    <!-- 가로 배치를 위한 넓은 레이아웃 100% -->
     <div style="max-width:100%; width: 100%; margin:0 auto; flex:1; display:flex; flex-direction:column;">
-      <div class="score-grid" id="score-section" style="display:none">
-        <div class="score-card" id="score-card-0"><div class="team-name" id="score-name-0">Team 1</div><div class="score-num" id="score-num-0">0</div></div>
-        <div class="score-card" id="score-card-1"><div class="team-name" id="score-name-1">Team 2</div><div class="score-num" id="score-num-1">0</div></div>
-      </div>
+      <!-- 다중 팀 지원 반응형 점수판 -->
+      <div class="score-grid" id="score-section" style="display:none;"></div>
       
       <div class="game-layout">
         <div class="hangman-wrap">
@@ -556,9 +573,8 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const MAX_DEFAULT = 6;
-const TEACHER_PWD = "0000"; // 기본 교사 모드 암호
+const TEACHER_PWD = "0000";
 
-// 설정 객체
 let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [], teacherPwd: '0000' };
 
 function getActiveUnits() {
@@ -574,12 +590,12 @@ let state = {
     status: 'waiting', multiType: 'team', teams: ['', ''], scores: [0, 0],
     currentTeam: 0, unit: -1, wordPool: [], usedWords: [], current: {w:'', h:''}, 
     guessed: [], wrong: 0, roundNum: 0, maxWrong: 6, hintMode: 'korean',
-    lastEarned: 0 // 이번 라운드에 획득한 보너스 점수 동기화
+    lastEarned: 0
   },
   student: { grade: '', cls: '', num: '', name: '' },
   guestTempRoomType: null,
   startTime: null,
-  scoreSaved: false // 명예의전당 중복 저장 방지 플래그
+  scoreSaved: false
 };
 
 // --- Firebase 초기화 ---
@@ -640,7 +656,7 @@ const initFirebase = async () => {
 };
 initFirebase();
 
-// --- 네트워크(Firebase Firestore) 방 로직 ---
+// --- 네트워크 방 로직 ---
 const net = {
   getRoomRef: (roomId) => {
     if (!isExternalEnv) return doc(db, 'artifacts', appId, 'public', 'data', 'hangman_rooms', roomId);
@@ -652,11 +668,12 @@ const net = {
     const errEl = document.getElementById('host-err');
     errEl.textContent = '';
     
-    const multiType = document.getElementById('host-multi-type').value;
+    const multiType = state.mode === 'host_team' ? 'team' : '1v1';
+    let teamCount = multiType === 'team' ? parseInt(document.getElementById('host-team-count').value) : 2;
     let teamName = '', studentInfo = null;
 
     if (multiType === 'team') {
-      teamName = document.getElementById('host-team-name').value.trim() || '블루팀';
+      teamName = document.getElementById('host-team-name').value.trim() || '팀 1';
     } else {
       studentInfo = {
         grade: document.getElementById('host-st-grade').value,
@@ -678,7 +695,8 @@ const net = {
     const initialSync = {
       ...state.sync,
       multiType: multiType,
-      teams: [teamName, ''],
+      teams: [teamName].concat(Array(teamCount - 1).fill('')), // 참가할 빈 슬롯들 생성
+      scores: Array(teamCount).fill(0),
       status: 'waiting',
       maxWrong: cfg.maxWrong || 6,
       hintMode: cfg.hint || 'korean'
@@ -731,7 +749,7 @@ const net = {
       
       state.guestTempRoomType = roomData.multiType;
       
-      const infoMsg = roomData.multiType === 'team' ? "팀 대항전 모드입니다. 팀 이름을 정해주세요!" : "1:1 개인전(타임어택) 모드입니다. 학생 정보를 입력하세요!";
+      const infoMsg = roomData.multiType === 'team' ? "단체전 대결 모드입니다. 팀 이름을 정해주세요!" : "1:1 개인전(타임어택) 모드입니다. 학생 정보를 입력하세요!";
       document.getElementById('guest-room-info').textContent = infoMsg;
       
       document.getElementById('guest-team-input').style.display = roomData.multiType === 'team' ? 'block' : 'none';
@@ -751,7 +769,7 @@ const net = {
     let teamName = '', studentInfo = null;
     
     if (state.guestTempRoomType === 'team') {
-      teamName = document.getElementById('guest-team-name').value.trim() || '레드팀';
+      teamName = document.getElementById('guest-team-name').value.trim() || '참가팀';
     } else {
       studentInfo = {
         grade: document.getElementById('guest-st-grade').value,
@@ -778,7 +796,13 @@ const net = {
         btn.disabled = false; return errEl.textContent = "입장 중 방 상태가 변경되었습니다.";
       }
       
-      roomData.teams[1] = teamName;
+      // 빈 슬롯 찾기
+      let myTeamIdx = roomData.teams.findIndex(t => t === '');
+      if (myTeamIdx === -1) {
+        btn.disabled = false; return errEl.textContent = "방이 이미 꽉 찼습니다!";
+      }
+
+      roomData.teams[myTeamIdx] = teamName;
       await updateDoc(roomRef, { sync: roomData });
       
       btn.style.display = 'none';
@@ -786,7 +810,7 @@ const net = {
       document.getElementById('guest-waiting-area').style.display = 'block';
       
       state.roomId = roomId;
-      state.myTeamIdx = 1;
+      state.myTeamIdx = myTeamIdx;
       ui.saveRejoinData();
       net.listenRoom(roomId);
     } catch (e) {
@@ -804,9 +828,12 @@ const net = {
       const data = docSnap.data().sync;
       state.sync = data;
       
-      if (state.mode === 'host' && state.sync.status === 'waiting' && state.sync.teams[1] !== '') {
-        ui.showScreen('screen-unit');
-        document.getElementById('unit-subtitle').textContent = `[${state.sync.teams[1]}] 참가 완료! 단원을 선택하세요.`;
+      if (state.mode.startsWith('host') && state.sync.status === 'waiting') {
+        const joinedCount = state.sync.teams.filter(t => t !== '').length;
+        if (joinedCount > 1) { // 1명 이상 참가 시 단원 선택으로 이동 가능
+          ui.showScreen('screen-unit');
+          document.getElementById('unit-subtitle').textContent = `현재 ${joinedCount}/${state.sync.teams.length}팀 참가 중! 단원을 선택해 시작하세요.`;
+        }
       }
       else if (state.mode === 'guest' && state.sync.status === 'playing') {
         if(!document.getElementById('screen-game').classList.contains('active')) {
@@ -815,7 +842,7 @@ const net = {
         }
         game.renderAll();
       }
-      else if (state.mode === 'host' && state.sync.status === 'playing') {
+      else if (state.mode.startsWith('host') && state.sync.status === 'playing') {
         if(!document.getElementById('screen-game').classList.contains('active')) {
            ui.showScreen('screen-game'); 
         }
@@ -863,9 +890,10 @@ const game = {
 
     state.sync.usedWords = [];
     state.sync.roundNum = 0;
-    state.sync.scores = [0, 0];
+    
+    // 호스트가 시작 시 접속 안 한 팀이 있으면 그 팀들은 점수를 0으로 놔둠. 차례에서는 스킵됨.
     state.sync.currentTeam = 0;
-    state.scoreSaved = false; // 새 게임 시작시 명예의 전당 저장 초기화
+    state.scoreSaved = false;
     
     ui.showScreen('screen-game');
     await game.initNextRound();
@@ -912,18 +940,22 @@ const game = {
   
   updateHeader: () => {
     let metaText = '';
+    const scoreSection = document.getElementById('score-section');
+
     if (state.isMulti) {
-      let is1v1 = (state.sync.multiType === '1v1');
-      let scoreLabel = is1v1 ? '점' : '번 성공';
       metaText = `방코드: ${state.roomId} | 라운드: ${state.sync.roundNum}/${state.sync.wordPool.length}`;
-      document.getElementById('score-section').style.display = 'grid';
-      document.getElementById('score-name-0').textContent = state.sync.teams[0];
-      document.getElementById('score-name-1').textContent = state.sync.teams[1];
-      document.getElementById('score-num-0').textContent = state.sync.scores[0] + (is1v1 ? '' : '');
-      document.getElementById('score-num-1').textContent = state.sync.scores[1] + (is1v1 ? '' : '');
       
-      document.getElementById('score-card-0').className = 'score-card' + (state.sync.currentTeam === 0 ? ' active-team' : '');
-      document.getElementById('score-card-1').className = 'score-card' + (state.sync.currentTeam === 1 ? ' active-team' : '');
+      // 다중 팀 점수판 동적 렌더링
+      scoreSection.style.display = 'grid';
+      scoreSection.style.gridTemplateColumns = `repeat(auto-fit, minmax(90px, 1fr))`;
+      scoreSection.innerHTML = '';
+
+      state.sync.teams.forEach((tName, idx) => {
+        const card = document.createElement('div');
+        card.className = 'score-card' + (state.sync.currentTeam === idx ? ' active-team' : '');
+        card.innerHTML = `<div class="team-name">${tName || '(대기중)'}</div><div class="score-num">${state.sync.scores[idx]}</div>`;
+        scoreSection.appendChild(card);
+      });
       
       const badge = document.getElementById('turn-badge');
       badge.style.display = 'block';
@@ -931,13 +963,13 @@ const game = {
         badge.textContent = '나의 차례입니다!';
         badge.className = 'turn-badge my-turn';
       } else {
-        badge.textContent = `${state.sync.teams[state.sync.currentTeam]}의 차례 대기중...`;
+        badge.textContent = `${state.sync.teams[state.sync.currentTeam] || '빈 팀'}의 차례 대기중...`;
         badge.className = 'turn-badge wait-turn';
       }
     } else {
       const s = state.student;
       metaText = `${s.grade}학년 ${s.cls}반 ${s.name} | 라운드: ${state.sync.roundNum}/${state.sync.wordPool.length} | 점수: ${state.sync.scores[0]}점`;
-      document.getElementById('score-section').style.display = 'none';
+      scoreSection.style.display = 'none';
       document.getElementById('turn-badge').style.display = 'none';
     }
     document.getElementById('game-meta').textContent = metaText;
@@ -1022,11 +1054,11 @@ const game = {
         const elapsed = Math.round((Date.now() - state.startTime) / 1000);
         let earned = 0;
         
-        // 개인전 또는 1:1 모드일 때 보너스 점수 지급
+        // 개인전 또는 1:1 모드일 때 시간단축 보너스 점수 지급
         if (state.mode === 'solo' || state.sync.multiType === '1v1') {
-            earned = 100 + Math.max(100 - (elapsed * 2), 0); // 100점 기본 + 빨리 맞출수록 최대 100점 가점
+            earned = 100 + Math.max(100 - (elapsed * 2), 0);
         } else {
-            earned = 1; // 일반 팀전은 1개 성공으로 카운트
+            earned = 1; // 단체 팀전은 맞춘 개수(+1)로 카운트
         }
         state.sync.lastEarned = earned;
 
@@ -1070,18 +1102,18 @@ const game = {
     const waitingMsg = document.getElementById('waiting-next-msg');
     const leaderboardBtn = document.getElementById('leaderboard-btn');
     
-    // 최종 라운드 버튼 토글
+    // 최종 라운드 명예의전당 버튼 토글 초기화
     leaderboardBtn.style.display = 'none';
 
     if (state.isMulti) {
-      if (state.mode === 'host') { 
+      if (state.mode.startsWith('host')) { 
         nextBtn.style.display = 'block';
         nextBtn.textContent = remaining > 0 ? '다음 단어 진행하기 →' : '최종 결과 보기';
         waitingMsg.style.display = 'none';
       } else {
         nextBtn.style.display = 'none';
         waitingMsg.style.display = 'block';
-        waitingMsg.textContent = remaining > 0 ? '상대방이 다음 라운드를 준비 중입니다...' : '상대방이 최종 결과를 산출 중입니다...';
+        waitingMsg.textContent = remaining > 0 ? '방장이 다음 라운드를 준비 중입니다...' : '방장이 최종 결과를 산출 중입니다...';
       }
     } else {
       nextBtn.style.display = 'block';
@@ -1092,19 +1124,29 @@ const game = {
     document.getElementById('result-overlay').classList.add('show');
     
     const statusEl = document.getElementById('sheet-save-status');
-    if (!state.isMulti || state.mode === 'host') {
+    if (!state.isMulti || state.mode.startsWith('host')) {
       statusEl.textContent = '클라우드에 결과 기록 중...';
       settings.logResultToCloud(state.sync.current.w, won, state.sync.wrong, elapsed)
         .then(() => { statusEl.textContent = '✓ 라운드 자동 저장됨'; })
         .catch(() => { statusEl.textContent = '⚠ 기록 전송에 실패했습니다'; });
     } else {
-       statusEl.textContent = '호스트가 결과를 기록 중입니다.';
+       statusEl.textContent = '방장이 결과를 기록 중입니다.';
     }
   },
   
   nextRound: async () => {
-    if (state.isMulti && state.mode !== 'host') return;
-    if (state.isMulti) state.sync.currentTeam = 1 - state.sync.currentTeam;
+    if (state.isMulti && !state.mode.startsWith('host')) return;
+    
+    if (state.isMulti) {
+       // 비어있는 팀 건너뛰기 로직
+       let next = (state.sync.currentTeam + 1) % state.sync.teams.length;
+       let loopCount = 0;
+       while(state.sync.teams[next] === '' && loopCount < state.sync.teams.length) {
+          next = (next + 1) % state.sync.teams.length;
+          loopCount++;
+       }
+       state.sync.currentTeam = next;
+    }
     await game.initNextRound();
   },
   
@@ -1115,9 +1157,17 @@ const game = {
     
     let msg = '';
     if (state.isMulti) {
-       if(state.sync.scores[0] > state.sync.scores[1]) msg = `🏆 ${state.sync.teams[0]} 최종 승리! (${state.sync.scores[0]} : ${state.sync.scores[1]})`;
-       else if(state.sync.scores[1] > state.sync.scores[0]) msg = `🏆 ${state.sync.teams[1]} 최종 승리! (${state.sync.scores[1]} : ${state.sync.scores[0]})`;
-       else msg = `🤝 ${state.sync.scores[0]} : ${state.sync.scores[1]} 동점! 무승부입니다.`;
+       let maxScore = Math.max(...state.sync.scores);
+       let winners = [];
+       state.sync.scores.forEach((s, idx) => {
+           if (s === maxScore && state.sync.teams[idx] !== '') winners.push(state.sync.teams[idx]);
+       });
+       
+       if (winners.length > 1) {
+           msg = `🤝 ${winners.join(', ')} 공동 우승! (${maxScore}${state.sync.multiType==='team'?'번 성공':'점'})`;
+       } else {
+           msg = `🏆 ${winners[0]} 최종 우승! (${maxScore}${state.sync.multiType==='team'?'번 성공':'점'})`;
+       }
     } else {
        const s = state.student;
        msg = `수고하셨습니다! ${s.name} 학생, 총 <b>${state.sync.scores[0]}점</b>을 획득했습니다!`;
@@ -1185,21 +1235,22 @@ const ui = {
   },
 
   selectMode: (mode) => {
-    state.mode = mode;
-    state.isMulti = (mode === 'host' || mode === 'guest');
+    state.mode = mode; // 'solo', 'host_1v1', 'host_team', 'guest'
+    state.isMulti = mode.startsWith('host') || mode === 'guest';
     ui.resetNetworkUI();
     
     if (mode === 'solo') ui.showScreen('screen-student');
-    else if (mode === 'host') ui.showScreen('screen-host-setup');
+    else if (mode === 'host_1v1' || mode === 'host_team') {
+       ui.showScreen('screen-host-setup');
+       const isTeam = (mode === 'host_team');
+       document.getElementById('host-mode-title').textContent = isTeam ? '단체전 방 만들기 (2~10팀)' : '개인전 방 만들기 (1:1 타임어택)';
+       document.getElementById('host-team-count-wrap').style.display = isTeam ? 'block' : 'none';
+       document.getElementById('host-team-input').style.display = isTeam ? 'block' : 'none';
+       document.getElementById('host-1v1-input').style.display = !isTeam ? 'block' : 'none';
+    }
     else if (mode === 'guest') ui.showScreen('screen-guest-setup');
   },
   
-  toggleHostMode: () => {
-    const type = document.getElementById('host-multi-type').value;
-    document.getElementById('host-team-input').style.display = type === 'team' ? 'block' : 'none';
-    document.getElementById('host-1v1-input').style.display = type === '1v1' ? 'block' : 'none';
-  },
-
   confirmStudent: () => {
     const grade = document.getElementById('st-grade').value;
     const cls = document.getElementById('st-class').value;
@@ -1411,24 +1462,24 @@ const settings = {
   // 최종 점수 명예의 전당 저장 (학생/개인전)
   saveLeaderboardScore: async () => {
     if (!db || state.scoreSaved) return; // 중복 저장 방지
-    if (state.mode === 'guest' && state.sync.multiType === 'team') return; // 팀전 게스트는 저장 생략 (필요에 따라 호스트만)
-
+    // 팀전에서 게스트는 저장 생략 (호스트가 대표로 저장하거나, 팀전은 제외)
+    // 모든 모드에서 점수가 0점 이상이면 본인 팀/본인 점수 저장
     let myScore = state.isMulti ? state.sync.scores[state.myTeamIdx] : state.sync.scores[0];
-    if (myScore <= 0) return; // 0점 이하는 명예의 전당 제외
+    if (myScore <= 0) return;
 
     let unitTitle = state.sync.unit !== -1 && getActiveUnits()[state.sync.unit] ? getActiveUnits()[state.sync.unit].title : "전체 단어 섞기";
     let playerName = "";
     let modeName = state.mode;
 
     if (state.isMulti && state.sync.multiType === 'team') {
-       playerName = state.sync.teams[state.myTeamIdx];
-       modeName = "팀 대항전";
+       playerName = state.sync.teams[state.myTeamIdx] || "알 수 없는 팀";
+       modeName = "단체전";
     } else if (state.isMulti && state.sync.multiType === '1v1') {
-       playerName = state.sync.teams[state.myTeamIdx];
+       playerName = state.sync.teams[state.myTeamIdx] || "알 수 없는 플레이어";
        modeName = "1:1 개인전";
     } else {
        playerName = `${state.student.grade}학년 ${state.student.cls}반 ${state.student.name}`;
-       modeName = "개인전(솔로)";
+       modeName = "1인 플레이";
     }
 
     state.scoreSaved = true;
@@ -1474,10 +1525,10 @@ const settings = {
 
     if (state.isMulti && state.sync.multiType === 'team') {
        modeName = "멀티 팀 대항전";
-       playerName = `[팀전] ${state.sync.teams.join(' vs ')}`;
+       playerName = `[팀전] ${state.sync.teams.filter(t=>t).join(' vs ')}`;
     } else if (state.isMulti && state.sync.multiType === '1v1') {
        modeName = "멀티 1:1 개인전";
-       playerName = state.sync.teams[state.sync.currentTeam] + " (팀" + (state.sync.currentTeam+1) + ")";
+       playerName = state.sync.teams[state.sync.currentTeam] + " (진행자)";
     } else {
        modeName = "솔로 모드";
        const s = state.student;

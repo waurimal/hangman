@@ -37,7 +37,7 @@
 
 body {
   font-family: var(--font-sans); background: var(--bg-body); color: var(--color-text-primary);
-  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem;
 }
 
 #app {
@@ -45,18 +45,26 @@ body {
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.6); border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-float); padding: 2.5rem 1.5rem; position: relative;
-  overflow: hidden; display: flex; flex-direction: column;
+  overflow: hidden; display: flex; flex-direction: column; transition: max-width 0.3s ease, padding 0.3s ease;
 }
 
-/* 넓은 화면용(결과창 등)을 위한 클래스 */
-#app.wide-mode { max-width: 800px; transition: max-width 0.3s ease; }
+/* 넓은 화면용(게임창, 결과창)을 위한 클래스 */
+#app.wide-mode { max-width: 800px; padding-top: 1.5rem; }
+
+/* 푸터 (제작자 정보) */
+.app-footer {
+  margin-top: 1.5rem; text-align: center; font-size: 13px; font-weight: 600; color: var(--color-text-secondary); line-height: 1.6;
+}
+.app-footer .copyright {
+  font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-top: 2px;
+}
 
 .screen { display: none; opacity: 0; flex: 1; }
 .screen.active { display: flex; flex-direction: column; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25rem; letter-spacing: -0.5px; }
-.subtitle { font-size: 14px; color: var(--color-text-secondary); text-align: center; margin-bottom: 2rem; font-weight: 500; }
+h1 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 0.25rem; letter-spacing: -0.5px; color: var(--primary); }
+.subtitle { font-size: 14px; color: var(--color-text-secondary); text-align: center; margin-bottom: 2rem; font-weight: 600; }
 
 .btn-primary {
   display: block; width: 100%; padding: 0.8rem 1.5rem; background: linear-gradient(to right, var(--primary), #6366f1);
@@ -69,7 +77,7 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
 
 .btn-ghost {
   display: inline-block; padding: 0.5rem 1rem; background: rgba(255,255,255,0.5); border: 1px solid var(--color-border);
-  border-radius: 99px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s;
+  border-radius: 99px; font-size: 13px; font-weight: 600; color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s;
 }
 .btn-ghost:hover { background: #ffffff; color: var(--color-text-primary); border-color: var(--color-text-tertiary); }
 
@@ -92,7 +100,7 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
 .mode-card .icon { font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
 .mode-card .text-wrap { flex: 1; }
 .mode-card .label { font-size: 16px; font-weight: 700; color: var(--color-text-primary); }
-.mode-card .desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+.mode-card .desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500;}
 
 .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 2rem; overflow-y: auto; padding-bottom: 10px;}
 .unit-btn { background: #ffffff; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); padding: 1rem; cursor: pointer; text-align: left; font-size: 14px; font-weight: 600; color: var(--color-text-primary); transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; }
@@ -103,40 +111,41 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
 .student-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 .game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-.game-header .meta { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 99px;}
-.turn-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: #e0e7ff; color: var(--primary); transition: 0.3s; }
+.game-header .meta { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); background: rgba(0,0,0,0.05); padding: 6px 12px; border-radius: 99px;}
+.turn-badge { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 99px; background: #e0e7ff; color: var(--primary); transition: 0.3s; }
 .turn-badge.my-turn { background: var(--success); color: white; animation: pulse 2s infinite; }
 .turn-badge.wait-turn { background: #f1f5f9; color: var(--color-text-secondary); }
 
-.game-layout { display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: start; margin-bottom: 1rem;}
-@media (max-width: 480px) {
-  .game-layout { grid-template-columns: 1fr; gap: 15px; }
-  .hangman-wrap { max-width: 200px; margin: 0 auto; }
+/* 게임 가로 레이아웃 설정 */
+.game-layout { display: grid; grid-template-columns: 240px 1fr; gap: 30px; align-items: start; margin-bottom: 1rem;}
+@media (max-width: 600px) {
+  .game-layout { grid-template-columns: 1fr; gap: 20px; }
+  .hangman-wrap { max-width: 220px; margin: 0 auto; }
 }
 
-.hangman-wrap { background: #ffffff; border-radius: var(--border-radius-lg); padding: 15px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
-.hangman-svg { width: 100%; height: auto; max-height: 160px; }
-.lives-bar { display: flex; gap: 4px; justify-content: center; margin-top: 10px; }
-.heart { font-size: 14px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+.hangman-wrap { background: #ffffff; border-radius: var(--border-radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
+.hangman-svg { width: 100%; height: auto; max-height: 200px; }
+.lives-bar { display: flex; gap: 4px; justify-content: center; margin-top: 15px; }
+.heart { font-size: 16px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
 
-.hint-box { font-size: 13px; font-weight: 600; color: var(--primary); background: #e0e7ff; border-radius: var(--border-radius-md); padding: 8px 12px; margin-bottom: 15px; text-align: center; }
+.hint-box { font-size: 14px; font-weight: 600; color: var(--primary); background: #e0e7ff; border-radius: var(--border-radius-md); padding: 10px 15px; margin-bottom: 20px; text-align: center; }
 
-.word-display { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; justify-content: center; min-height: 40px;}
-.letter-box { width: 32px; height: 40px; border-bottom: 3px solid var(--color-text-primary); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; text-transform: uppercase; }
+.word-display { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; justify-content: center; min-height: 40px;}
+.letter-box { width: 36px; height: 46px; border-bottom: 4px solid var(--color-text-primary); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; text-transform: uppercase; }
 .letter-box.space { border-bottom: none; width: 16px; }
 
-.alphabet-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; transition: opacity 0.3s; }
+.alphabet-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; transition: opacity 0.3s; }
 .alphabet-grid.disabled { opacity: 0.5; pointer-events: none; }
-.alpha-btn { width: 36px; height: 42px; border: 1px solid var(--color-border); border-radius: 8px; background: #ffffff; font-size: 16px; font-weight: 700; color: var(--color-text-primary); cursor: pointer; box-shadow: 0 4px 0 var(--color-border); transition: all 0.1s; }
+.alpha-btn { width: 40px; height: 46px; border: 1px solid var(--color-border); border-radius: 8px; background: #ffffff; font-size: 18px; font-weight: 700; color: var(--color-text-primary); cursor: pointer; box-shadow: 0 4px 0 var(--color-border); transition: all 0.1s; }
 .alpha-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
 .alpha-btn.correct { background: var(--success); border-color: #059669; color: white; box-shadow: 0 4px 0 #059669; }
 .alpha-btn.wrong { background: #f1f5f9; color: var(--color-text-tertiary); border-color: #e2e8f0; box-shadow: none; transform: translateY(4px); opacity: 0.7; }
 .alpha-btn:disabled { cursor: default; }
 
-.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
-.score-card { background: #ffffff; border-radius: var(--border-radius-md); padding: 0.8rem; text-align: center; border: 2px solid transparent; box-shadow: var(--shadow-sm); transition: 0.3s; }
-.score-card .team-name { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 4px; }
-.score-card .score-num { font-size: 28px; font-weight: 800; color: var(--color-text-primary); line-height: 1; }
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1.5rem; }
+.score-card { background: #ffffff; border-radius: var(--border-radius-md); padding: 1rem; text-align: center; border: 2px solid transparent; box-shadow: var(--shadow-sm); transition: 0.3s; }
+.score-card .team-name { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 4px; }
+.score-card .score-num { font-size: 32px; font-weight: 800; color: var(--color-text-primary); line-height: 1; }
 .score-card.active-team { border-color: var(--primary); background: #f5f3ff; transform: scale(1.02); box-shadow: var(--shadow-md); }
 
 .result-overlay { display: none; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; border-radius: var(--border-radius-lg); }
@@ -164,10 +173,8 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
 .rejoin-banner button:hover { background: rgba(255,255,255,0.3); }
 
 /* 교사 패널 */
-.teacher-fab { position: fixed; bottom: 20px; right: 20px; width: 48px; height: 48px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; z-index: 200; box-shadow: var(--shadow-lg); transition: all 0.2s; border: 1px solid var(--color-border); }
-.teacher-fab:hover { transform: scale(1.1) rotate(15deg); }
-.teacher-panel { position: fixed; bottom: 80px; right: 20px; width: 350px; max-width: calc(100vw - 40px); max-height: 80vh; overflow-y: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: var(--border-radius-lg); padding: 1.5rem; z-index: 200; box-shadow: var(--shadow-float); transform: translateY(20px); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-.teacher-panel.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.teacher-panel { position: fixed; bottom: 50px; right: 50%; transform: translateX(50%) translateY(20px); width: 380px; max-width: calc(100vw - 40px); max-height: 80vh; overflow-y: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: var(--border-radius-lg); padding: 1.5rem; z-index: 200; box-shadow: var(--shadow-float); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.teacher-panel.open { transform: translateX(50%) translateY(0); opacity: 1; pointer-events: auto; }
 .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 10px;}
 .panel-label { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: block; margin-top: 12px; margin-bottom: 4px; }
 .panel-input, .panel-select, .panel-textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #f8fafc; font-family: inherit; transition: border 0.2s; outline: none; }
@@ -210,11 +217,12 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
     </div>
     
     <div style="margin: auto 0;">
-      <h1>행맨 게임 🎮</h1>
-      <p class="subtitle">영어 단어를 맞춰보세요!</p>
-      <div class="mode-grid">
+      <h1 style="font-family: monospace;">WORD HANGMAN RACE</h1>
+      <p class="subtitle" style="font-size: 16px; color: var(--primary);">영어 단어 행맨 게임</p>
+      
+      <div class="mode-grid" style="margin-top: 2rem;">
         <div class="mode-card" onclick="ui.selectMode('solo')">
-          <div class="icon">🧑‍💻</div>
+          <div class="icon">🎮</div>
           <div class="text-wrap">
             <div class="label">1인 플레이</div>
             <div class="desc">혼자서 단어 맞추기 연습</div>
@@ -234,6 +242,14 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
             <div class="desc">초대 코드를 입력하고 입장하세요</div>
           </div>
         </div>
+      </div>
+      
+      <!-- 교사 모드 버튼 -->
+      <div style="border-top: 1px solid var(--color-border); margin: 2rem 0 1.5rem;"></div>
+      <div style="text-align: center;">
+        <button class="btn-ghost" style="padding: 0.6rem 1.8rem; border-radius: 99px; background: #ffffff; box-shadow: var(--shadow-sm);" onclick="settings.openPasswordModal()">
+          🔧 교사 모드 (설정)
+        </button>
       </div>
     </div>
   </div>
@@ -372,7 +388,8 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
       <div class="turn-badge" id="turn-badge"></div>
     </div>
     
-    <div style="max-width:440px; width: 100%; margin:0 auto; flex:1; display:flex; flex-direction:column;">
+    <!-- 가로 배치를 위한 넓은 레이아웃 100% -->
+    <div style="max-width:100%; width: 100%; margin:0 auto; flex:1; display:flex; flex-direction:column;">
       <div class="score-grid" id="score-section" style="display:none">
         <div class="score-card" id="score-card-0"><div class="team-name" id="score-name-0">Team 1</div><div class="score-num" id="score-num-0">0</div></div>
         <div class="score-card" id="score-card-1"><div class="team-name" id="score-name-1">Team 2</div><div class="score-num" id="score-num-1">0</div></div>
@@ -387,21 +404,6 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
           <div class="hint-box" id="hint-box"></div>
           <div class="word-display" id="word-display"></div>
           <div class="alphabet-grid" id="alpha-grid"></div>
-        </div>
-      </div>
-      
-      <!-- 결과 팝업 -->
-      <div class="result-overlay" id="result-overlay">
-        <div class="result-card">
-          <div class="result-emoji" id="result-emoji"></div>
-          <div class="result-word" id="result-word"></div>
-          <div class="result-msg" id="result-msg"></div>
-          <div id="sheet-save-status" style="font-size:12px; font-weight:600; color:var(--primary); margin-bottom:12px; min-height:16px;"></div>
-          
-          <button class="btn-primary" onclick="game.nextRound()" id="next-btn" style="margin-bottom: 10px;">다음 단어 →</button>
-          <div id="waiting-next-msg" style="display:none; font-size:13px; font-weight:600; color:var(--primary); margin-bottom:15px;">상대방이 다음 라운드를 준비 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px;"></div></div>
-          
-          <button class="btn-ghost" onclick="ui.exitGame()">게임 완전히 끝내기</button>
         </div>
       </div>
     </div>
@@ -438,12 +440,46 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
+  <!-- 교사 암호 입력 팝업 -->
+  <div class="result-overlay" id="pwd-overlay">
+    <div class="result-card" style="max-width: 300px; padding: 2rem;">
+      <h3 style="margin-bottom: 10px; font-size: 18px; font-weight: 700;">🔒 교사 모드</h3>
+      <p style="font-size:13px; color:var(--color-text-secondary); margin-bottom: 20px;">접근 암호를 입력해주세요.</p>
+      <input type="password" id="teacher-pwd" class="panel-input" style="text-align:center; font-size: 24px; letter-spacing: 5px; margin-bottom: 20px; font-weight: 700;"/>
+      <button class="btn-primary" onclick="settings.checkPassword()">확인</button>
+      <button class="btn-ghost" onclick="settings.closePasswordModal()" style="margin-top: 8px;">취소</button>
+    </div>
+  </div>
+
+  <!-- 게임 결과 팝업 -->
+  <div class="result-overlay" id="result-overlay">
+    <div class="result-card">
+      <div class="result-emoji" id="result-emoji"></div>
+      <div class="result-word" id="result-word"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div id="sheet-save-status" style="font-size:12px; font-weight:600; color:var(--primary); margin-bottom:12px; min-height:16px;"></div>
+      
+      <button class="btn-primary" onclick="game.nextRound()" id="next-btn" style="margin-bottom: 10px;">다음 단어 →</button>
+      <div id="waiting-next-msg" style="display:none; font-size:13px; font-weight:600; color:var(--primary); margin-bottom:15px;">상대방이 다음 라운드를 준비 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px;"></div></div>
+      
+      <button class="btn-ghost" onclick="ui.exitGame()">게임 완전히 끝내기</button>
+    </div>
+  </div>
+
 </div>
 
-<!-- 교사 설정 -->
-<div class="teacher-fab" onclick="document.getElementById('teacher-panel').classList.toggle('open')" title="교사 설정">⚙️</div>
+<!-- 푸터 (만든이 정보) -->
+<div class="app-footer">
+  만든이: 곽현석(이의초등학교)<br>
+  <div class="copyright">Copyright © 2026 Eui Elementary School. All Rights Reserved.</div>
+</div>
+
+<!-- 교사 설정 패널 -->
 <div class="teacher-panel" id="teacher-panel">
-  <div class="panel-title">교사 관리 패널</div>
+  <div class="panel-title">
+    교사 관리 패널
+    <button class="btn-ghost" style="padding: 2px 8px; font-size: 12px; border:none;" onclick="document.getElementById('teacher-panel').classList.remove('open')">✕ 닫기</button>
+  </div>
   
   <div style="margin-bottom: 15px;">
     <button class="panel-btn sec" onclick="ui.showResults()"><span style="font-size:14px; margin-right:4px;">📊</span> 학생 결과 현황 및 다운로드</button>
@@ -472,40 +508,25 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const MAX_DEFAULT = 6;
+const TEACHER_PWD = "0000"; // 기본 교사 모드 암호
 
-// 설정 객체 (단원만 남김)
+// 설정 객체
 let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [] };
 
-// 활성화된 단원 목록 반환
 function getActiveUnits() {
   return (cfg.customUnits && cfg.customUnits.length > 0) ? cfg.customUnits : [];
 }
 
-// 게임 상태 객체
 let state = {
-  mode: 'solo', // 'solo', 'host', 'guest'
+  mode: 'solo',
   isMulti: false,
-  myTeamIdx: -1, // host:0, guest:1
+  myTeamIdx: -1,
   roomId: null,
-  
-  // 동기화되는 게임 데이터
   sync: {
-    status: 'waiting', // waiting, playing, result, finished
-    multiType: 'team', // 'team' or '1v1'
-    teams: ['', ''],
-    scores: [0, 0],
-    currentTeam: 0,
-    unit: -1,
-    wordPool: [],
-    usedWords: [],
-    current: {w:'', h:''}, 
-    guessed: [],
-    wrong: 0,
-    roundNum: 0,
-    maxWrong: 6,
-    hintMode: 'korean'
+    status: 'waiting', multiType: 'team', teams: ['', ''], scores: [0, 0],
+    currentTeam: 0, unit: -1, wordPool: [], usedWords: [], current: {w:'', h:''}, 
+    guessed: [], wrong: 0, roundNum: 0, maxWrong: 6, hintMode: 'korean'
   },
-  
   student: { grade: '', cls: '', num: '', name: '' },
   guestTempRoomType: null,
   startTime: null
@@ -552,7 +573,6 @@ const initFirebase = async () => {
     user = userCredential.user;
     onAuthStateChanged(auth, u => { user = u || user; });
     
-    // 🔥 전역 설정(Global Config) 클라우드에서 불러오기
     try {
       const configRef = !isExternalEnv ? doc(db, 'artifacts', appId, 'public', 'data', 'hangman_config', 'global') : doc(db, 'hangman_config', 'global');
       const snap = await getDoc(configRef);
@@ -564,7 +584,6 @@ const initFirebase = async () => {
     } catch(e) { console.error("전역 설정 로드 에러:", e); }
     
     ui.checkRejoin();
-    
   } catch(e) {
     console.error("Firebase 초기화 에러:", e);
   }
@@ -993,11 +1012,9 @@ const game = {
     
     document.getElementById('result-overlay').classList.add('show');
     
-    // 🔥 매 라운드 결과 Firebase 기록 저장
     const elapsed = Math.round((Date.now() - state.startTime) / 1000);
     const statusEl = document.getElementById('sheet-save-status');
     
-    // 호스트이거나 개인전(solo)일 때만 기록해서 중복 기록 방지
     if (!state.isMulti || state.mode === 'host') {
       statusEl.textContent = '클라우드에 결과 기록 중...';
       settings.logResultToCloud(state.sync.current.w, won, state.sync.wrong, elapsed)
@@ -1043,8 +1060,8 @@ const ui = {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
     
-    // 결과 화면은 넓게 표시
-    if (id === 'screen-results') document.getElementById('app').classList.add('wide-mode');
+    // 게임 화면 및 결과 화면은 가로 레이아웃(wide-mode) 활성화
+    if (id === 'screen-results' || id === 'screen-game') document.getElementById('app').classList.add('wide-mode');
     else document.getElementById('app').classList.remove('wide-mode');
   },
   
@@ -1113,7 +1130,7 @@ const ui = {
     const activeUnits = getActiveUnits();
     
     if (activeUnits.length === 0) {
-      grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--danger); font-size: 14px; padding: 20px;">우측 하단 설정(⚙️)에서 단원을 먼저 등록해 주세요.</div>';
+      grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--danger); font-size: 14px; padding: 20px;">홈 화면 하단 [교사 모드]에서 단원을 먼저 등록해 주세요.</div>';
       return;
     }
     
@@ -1135,7 +1152,6 @@ const ui = {
   clearRejoin: (hideBanner) => { sessionStorage.removeItem('hm_rejoin'); if (hideBanner) document.getElementById('rejoin-banner').style.display = 'none'; },
   checkRejoin: () => { if (sessionStorage.getItem('hm_rejoin')) { document.getElementById('rejoin-banner').style.display = 'flex'; } },
 
-  // 결과 현황판 호출
   showResults: async () => {
     document.getElementById('teacher-panel').classList.remove('open');
     ui.showScreen('screen-results');
@@ -1169,8 +1185,28 @@ const ui = {
   }
 };
 
-// --- Firebase 자체 저장 및 설정 로직 (Google Sheets 대체) ---
+// --- Firebase 자체 저장 및 교사 설정 모드 로직 ---
 const settings = {
+  // 교사 모드 암호 팝업 조작
+  openPasswordModal: () => {
+    document.getElementById('teacher-pwd').value = '';
+    document.getElementById('pwd-overlay').classList.add('show');
+    setTimeout(() => document.getElementById('teacher-pwd').focus(), 100);
+  },
+  closePasswordModal: () => {
+    document.getElementById('pwd-overlay').classList.remove('show');
+  },
+  checkPassword: () => {
+    if (document.getElementById('teacher-pwd').value === TEACHER_PWD) {
+      settings.closePasswordModal();
+      document.getElementById('teacher-panel').classList.add('open');
+    } else {
+      alert("암호가 일치하지 않습니다.");
+      document.getElementById('teacher-pwd').value = '';
+      document.getElementById('teacher-pwd').focus();
+    }
+  },
+
   saveLocal: () => { try { localStorage.setItem('hangman_cfg', JSON.stringify(cfg)); } catch (e) {} },
   loadLocal: () => { try { const s = localStorage.getItem('hangman_cfg'); if (s) { const p = JSON.parse(s); Object.assign(cfg, p); } } catch (e) {} settings.applyToPanel(); },
   
@@ -1236,12 +1272,10 @@ const settings = {
     }
   },
 
-  // 결과 수집을 위한 Collection 참조
   getResultsRef: () => {
      return !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_results') : collection(db, 'hangman_results');
   },
   
-  // 개별 라운드 결과를 Firestore에 저장
   logResultToCloud: async (word, correct, wrongCount, elapsed) => {
     if (!db) return;
     
@@ -1282,14 +1316,12 @@ const settings = {
     } catch(e) { console.error("결과 저장 실패", e); throw e; }
   },
 
-  // 결과 현황판 데이터 가져오기
   fetchResults: async () => {
     if (!db) return [];
     try {
       const snap = await getDocs(settings.getResultsRef());
       let results = [];
       snap.forEach(doc => results.push(doc.data()));
-      // 최신순으로 자바스크립트 메모리 상에서 정렬
       results.sort((a,b) => b.timestamp - a.timestamp); 
       return results;
     } catch (e) {
@@ -1299,19 +1331,16 @@ const settings = {
     }
   },
 
-  // CSV 다운로드 기능
   downloadCSV: async () => {
     const results = await settings.fetchResults();
     if (results.length === 0) {
       alert("다운로드할 데이터가 없습니다."); return;
     }
 
-    // 엑셀에서 한글이 깨지지 않도록 BOM 추가
     let csv = "\uFEFF"; 
     csv += "날짜 및 시간,모드,단원명,학생 정보/팀,단어,성공 여부,틀린 횟수,소요 시간(초)\n";
     
     results.forEach(r => {
-        // 내부 쉼표 처리를 위해 따옴표 감싸기
         const playerStr = r.player ? r.player.replace(/"/g, '""') : '';
         const wordStr = r.word ? r.word.replace(/"/g, '""') : '';
         const correctStr = r.correct === 'O' ? '성공' : '실패';
@@ -1328,6 +1357,11 @@ const settings = {
     URL.revokeObjectURL(url);
   }
 };
+
+// 암호 입력 모달 엔터키 이벤트 바인딩
+document.getElementById('teacher-pwd').addEventListener('keypress', function(e) {
+  if(e.key === 'Enter') settings.checkPassword();
+});
 
 // --- 초기화 ---
 window.ui = ui;

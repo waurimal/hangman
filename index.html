@@ -48,6 +48,9 @@ body {
   overflow: hidden; display: flex; flex-direction: column;
 }
 
+/* 넓은 화면용(결과창 등)을 위한 클래스 */
+#app.wide-mode { max-width: 800px; transition: max-width 0.3s ease; }
+
 .screen { display: none; opacity: 0; flex: 1; }
 .screen.active { display: flex; flex-direction: column; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -166,22 +169,29 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
 .teacher-panel { position: fixed; bottom: 80px; right: 20px; width: 350px; max-width: calc(100vw - 40px); max-height: 80vh; overflow-y: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: var(--border-radius-lg); padding: 1.5rem; z-index: 200; box-shadow: var(--shadow-float); transform: translateY(20px); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .teacher-panel.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
 .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 10px;}
-.panel-title span { font-size: 11px; font-weight: 600; }
 .panel-label { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: block; margin-top: 12px; margin-bottom: 4px; }
 .panel-input, .panel-select, .panel-textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #f8fafc; font-family: inherit; transition: border 0.2s; outline: none; }
 .panel-input:focus, .panel-select:focus, .panel-textarea:focus { border-color: var(--primary); background: #ffffff;}
-.panel-textarea { height: 120px; resize: none; line-height: 1.5; font-family: monospace; font-size: 12px; }
+.panel-textarea { height: 140px; resize: none; line-height: 1.5; font-family: monospace; font-size: 12px; }
 .panel-btn { width: 100%; margin-top: 10px; padding: 0.6rem; background: var(--color-text-primary); color: #ffffff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .panel-btn:hover { background: #000000; transform: translateY(-1px); }
-.panel-btn.sec { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border); }
+.panel-btn.sec { background: transparent; color: var(--color-text-primary); border: 1px solid var(--color-border); margin-top: 5px; }
+.panel-btn.sec:hover { background: #f1f5f9; }
 .panel-status { font-size: 11px; font-weight: 600; margin-top: 8px; text-align: center; min-height: 16px; }
-.url-note { font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px; line-height: 1.4; }
-.connected-badge { background: var(--success); color: white; padding: 2px 8px; border-radius: 99px; }
+
+/* 데이터 테이블 (결과 현황) */
+.table-wrap { width: 100%; overflow-x: auto; background: #ffffff; border-radius: var(--border-radius-md); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); flex: 1; max-height: 60vh; overflow-y: auto;}
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; text-align: left;}
+.data-table th { background: #f8fafc; font-weight: 700; color: var(--color-text-secondary); padding: 12px 16px; border-bottom: 2px solid var(--color-border); position: sticky; top: 0;}
+.data-table td { padding: 10px 16px; border-bottom: 1px solid #e2e8f0; color: var(--color-text-primary); }
+.data-table tr:hover td { background: #f1f5f9; }
+.badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.badge.o { background: #dcfce7; color: #166534; }
+.badge.x { background: #fee2e2; color: #991b1b; }
 
 .text-center { text-align: center; width: 100%; margin-top: 1rem;}
 .loader { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(79, 70, 229, 0.3); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; margin-top: 10px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .room-code-display { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 4px; text-align: center; margin: 15px 0; background: #e0e7ff; padding: 10px; border-radius: 12px; }
 </style>
 </head>
@@ -234,7 +244,6 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
       <h1>학생 정보</h1>
       <p class="subtitle">게임 기록을 위해 정보를 입력해 주세요</p>
       <div class="student-card" id="solo-student-form">
-        <!-- 폼 필드는 JS 함수에서 재사용하기 위해 id 사용 -->
         <div class="student-info-grid">
           <div class="form-group"><label>학년</label><select id="st-grade"><option value="">선택</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
           <div class="form-group"><label>반</label><select id="st-class"><option value="">선택</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
@@ -264,7 +273,6 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
           </select>
         </div>
         
-        <!-- 팀 대항전 입력 폼 -->
         <div id="host-team-input">
           <div class="form-group">
             <label>우리 팀 이름 (호스트)</label>
@@ -272,7 +280,6 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
           </div>
         </div>
         
-        <!-- 1:1 개인전 입력 폼 -->
         <div id="host-1v1-input" style="display:none;">
           <div class="student-info-grid">
             <div class="form-group"><label>학년</label><select id="host-st-grade"><option value="">선택</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
@@ -305,7 +312,6 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
       <p class="subtitle">초대 코드를 입력하고 멀티플레이에 참가하세요</p>
       <div class="room-card">
         
-        <!-- 게스트 스텝 1: 코드 확인 -->
         <div id="guest-step1">
           <div class="form-group">
             <label>초대 코드 (4자리)</label>
@@ -314,7 +320,6 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
           <button class="btn-primary" id="btn-check-code" onclick="net.checkRoomCode()">방 확인하기</button>
         </div>
 
-        <!-- 게스트 스텝 2: 정보 입력 후 입장 -->
         <div id="guest-step2" style="display:none;">
           <div style="font-size:13px; color:var(--primary); font-weight:700; margin-bottom:15px; text-align:center; background:#e0e7ff; padding:8px; border-radius:8px;" id="guest-room-info">방 정보 불러오는 중...</div>
           
@@ -351,7 +356,7 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 5. 단원 선택 (솔로 & 호스트 공용) -->
+  <!-- 5. 단원 선택 -->
   <div id="screen-unit" class="screen">
     <h1>단원 선택</h1>
     <p class="subtitle" id="unit-subtitle">어떤 주제의 단어를 맞혀볼까요?</p>
@@ -401,25 +406,62 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
       </div>
     </div>
   </div>
+
+  <!-- 7. 게임 현황 대시보드 (교사용) -->
+  <div id="screen-results" class="screen">
+    <h1>학생 게임 결과 기록표</h1>
+    <p class="subtitle" style="margin-bottom: 15px;">모든 개인전 및 1:1 대전 결과가 표시됩니다.</p>
+    
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+      <button class="btn-ghost" onclick="ui.goHome()">← 홈으로</button>
+      <button class="btn-primary" style="width:auto; margin:0; padding:0.6rem 1.2rem; font-size:13px;" onclick="settings.downloadCSV()">엑셀(CSV) 다운로드 📥</button>
+    </div>
+    
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>날짜 및 시간</th>
+            <th>모드</th>
+            <th>단원명</th>
+            <th>학생 정보 / 팀</th>
+            <th>맞춘 단어</th>
+            <th>성공 여부</th>
+            <th>틀린 횟수</th>
+            <th>소요 시간</th>
+          </tr>
+        </thead>
+        <tbody id="results-tbody">
+          <tr><td colspan="8" style="text-align:center; padding:30px;">데이터를 불러오는 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px;"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- 교사 설정 -->
 <div class="teacher-fab" onclick="document.getElementById('teacher-panel').classList.toggle('open')" title="교사 설정">⚙️</div>
 <div class="teacher-panel" id="teacher-panel">
-  <div class="panel-title">교사 설정 <span id="connect-badge"></span></div>
-  <span class="panel-label">🌐 구글 시트 연동 URL (개인/1v1 모드)</span>
-  <input class="panel-input" id="sheet-url" type="text" placeholder="https://script.google.com/macros/s/..."/>
-  <div style="display:flex; gap:8px; margin-top:8px;">
-    <button class="panel-btn sec" style="margin-top:0" onclick="sheet.testConnection()">연결 테스트</button>
-    <button class="panel-btn sec" style="margin-top:0" onclick="sheet.loadFromSheet()">불러오기</button>
+  <div class="panel-title">교사 관리 패널</div>
+  
+  <div style="margin-bottom: 15px;">
+    <button class="panel-btn sec" onclick="ui.showResults()"><span style="font-size:14px; margin-right:4px;">📊</span> 학생 결과 현황 및 다운로드</button>
   </div>
-  <span class="panel-label" style="margin-top:16px;">🎯 최대 틀리기 횟수</span>
+  
+  <div style="border-top: 1px solid var(--color-border); margin: 15px 0;"></div>
+  
+  <span class="panel-label">🎯 최대 틀리기 횟수</span>
   <input class="panel-input" id="cfg-maxwrong" type="number" min="1" max="10" value="6"/>
   <span class="panel-label">💡 힌트 방식</span>
-  <select class="panel-select" id="cfg-hint"><option value="korean">한국어 뜻 제공</option><option value="firstletter">첫 글자 공개</option><option value="none">힌트 없음</option></select>
+  <select class="panel-select" id="cfg-hint">
+    <option value="korean">한국어 뜻 제공</option>
+    <option value="firstletter">첫 글자 공개</option>
+    <option value="none">힌트 없음</option>
+  </select>
   <span class="panel-label" style="margin-top:16px;">📝 단원/단어장 (단어,뜻)</span>
   <textarea class="panel-textarea" id="cfg-words" placeholder="# 1단원: 과일&#10;apple,사과&#10;banana,바나나&#10;&#10;# 2단원: 동물&#10;dog,개&#10;cat,고양이"></textarea>
-  <button class="panel-btn" onclick="sheet.saveSettings()" style="margin-top:16px;">저장하기</button>
+  <button class="panel-btn" onclick="settings.saveSettings()" style="margin-top:16px;">단어 및 설정 저장 (클라우드 반영)</button>
   <div class="panel-status" id="panel-status"></div>
 </div>
 
@@ -427,19 +469,19 @@ h1 { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 0.25r
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const MAX_DEFAULT = 6;
 
-// 설정 객체 (customUnits 추가)
-let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', sheetUrl: '', customUnits: [] };
+// 설정 객체 (단원만 남김)
+let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [] };
 
 // 활성화된 단원 목록 반환
 function getActiveUnits() {
   return (cfg.customUnits && cfg.customUnits.length > 0) ? cfg.customUnits : [];
 }
 
-// 게임 상태 객체 (솔로/네트워크 공용)
+// 게임 상태 객체
 let state = {
   mode: 'solo', // 'solo', 'host', 'guest'
   isMulti: false,
@@ -465,22 +507,20 @@ let state = {
   },
   
   student: { grade: '', cls: '', num: '', name: '' },
-  guestTempRoomType: null, // join 전 임시 상태 저장
+  guestTempRoomType: null,
   startTime: null
 };
 
 // --- Firebase 초기화 ---
 let app, auth, db, user, appId, unsubscribeRoom = null;
-let isExternalEnv = false; // 깃허브 외부 호스팅 여부 체크
+let isExternalEnv = false;
 
 const initFirebase = async () => {
   try {
     if (typeof __firebase_config !== 'undefined' && typeof __app_id !== 'undefined') {
-      // 제미나이 환경
       appId = __app_id;
       app = initializeApp(JSON.parse(__firebase_config));
     } else {
-      // 깃허브 외부 환경
       isExternalEnv = true;
       const myFirebaseConfig = {
         apiKey: "AIzaSyCcfTj1TqWJm4jsVcp67EjshDsJJombWKY",
@@ -492,7 +532,7 @@ const initFirebase = async () => {
       };
 
       if (myFirebaseConfig.apiKey === "YOUR_API_KEY") {
-        console.warn("개인 Firebase 설정이 입력되지 않아 멀티플레이 방을 생성할 수 없습니다.");
+        console.warn("개인 Firebase 설정이 없습니다.");
         return; 
       }
       appId = 'github-hosted-app';
@@ -512,7 +552,17 @@ const initFirebase = async () => {
     user = userCredential.user;
     onAuthStateChanged(auth, u => { user = u || user; });
     
-    // 초기화 완료 후 튕김 방지 체크
+    // 🔥 전역 설정(Global Config) 클라우드에서 불러오기
+    try {
+      const configRef = !isExternalEnv ? doc(db, 'artifacts', appId, 'public', 'data', 'hangman_config', 'global') : doc(db, 'hangman_config', 'global');
+      const snap = await getDoc(configRef);
+      if (snap.exists()) {
+        Object.assign(cfg, snap.data());
+        settings.applyToPanel();
+        ui.renderUnits();
+      }
+    } catch(e) { console.error("전역 설정 로드 에러:", e); }
+    
     ui.checkRejoin();
     
   } catch(e) {
@@ -521,7 +571,7 @@ const initFirebase = async () => {
 };
 initFirebase();
 
-// --- 네트워크(Firebase Firestore) 로직 ---
+// --- 네트워크(Firebase Firestore) 방 로직 ---
 const net = {
   getRoomRef: (roomId) => {
     if (!isExternalEnv) return doc(db, 'artifacts', appId, 'public', 'data', 'hangman_rooms', roomId);
@@ -538,7 +588,7 @@ const net = {
 
     if (multiType === 'team') {
       teamName = document.getElementById('host-team-name').value.trim() || '블루팀';
-    } else { // 1v1
+    } else {
       studentInfo = {
         grade: document.getElementById('host-st-grade').value,
         cls: document.getElementById('host-st-class').value,
@@ -548,8 +598,8 @@ const net = {
       if (!studentInfo.grade || !studentInfo.cls || !studentInfo.num || !studentInfo.name) {
          return errEl.textContent = '학생 정보를 모두 입력해주세요.';
       }
-      teamName = `${studentInfo.name}`; // 화면에 표시될 이름
-      state.student = studentInfo; // 내장 학생 정보 저장 (시트 기록용)
+      teamName = `${studentInfo.name}`; 
+      state.student = studentInfo;
     }
 
     const roomId = Math.random().toString(36).substring(2, 6).padEnd(4, 'A').toUpperCase();
@@ -574,7 +624,7 @@ const net = {
       
       state.roomId = roomId;
       state.myTeamIdx = 0;
-      ui.saveRejoinData(); // 재접속 세션 저장
+      ui.saveRejoinData(); 
       net.listenRoom(roomId);
     } catch (e) {
       console.error(e);
@@ -633,7 +683,7 @@ const net = {
     
     if (state.guestTempRoomType === 'team') {
       teamName = document.getElementById('guest-team-name').value.trim() || '레드팀';
-    } else { // 1v1
+    } else {
       studentInfo = {
         grade: document.getElementById('guest-st-grade').value,
         cls: document.getElementById('guest-st-class').value,
@@ -644,7 +694,7 @@ const net = {
          return errEl.textContent = '학생 정보를 모두 입력해주세요.';
       }
       teamName = `${studentInfo.name}`;
-      state.student = studentInfo; // 내장 정보
+      state.student = studentInfo;
     }
     
     const btn = document.getElementById('btn-join-room');
@@ -683,23 +733,22 @@ const net = {
          ui.clearRejoin(true); alert('방이 삭제되었거나 종료되었습니다.'); ui.goHome(); return;
       }
       const data = docSnap.data().sync;
-      state.sync = data; // 동기화
+      state.sync = data;
       
       if (state.mode === 'host' && state.sync.status === 'waiting' && state.sync.teams[1] !== '') {
-        // 호스트: 게스트 입장 완료시 단원 선택으로
         ui.showScreen('screen-unit');
         document.getElementById('unit-subtitle').textContent = `[${state.sync.teams[1]}] 참가 완료! 단원을 선택하세요.`;
       }
       else if (state.mode === 'guest' && state.sync.status === 'playing') {
-        if(document.getElementById('screen-game').classList.contains('active') === false) {
+        if(!document.getElementById('screen-game').classList.contains('active')) {
            ui.showScreen('screen-game');
            state.startTime = Date.now();
         }
         game.renderAll();
       }
       else if (state.mode === 'host' && state.sync.status === 'playing') {
-        if(document.getElementById('screen-game').classList.contains('active') === false) {
-           ui.showScreen('screen-game'); // 재접속시 등 커버
+        if(!document.getElementById('screen-game').classList.contains('active')) {
+           ui.showScreen('screen-game'); 
         }
         game.renderAll();
       }
@@ -710,9 +759,7 @@ const net = {
       else if (state.sync.status === 'finished') {
         game.showFinalResultUI();
       }
-    }, (error) => {
-      console.error("Firestore listen error:", error);
-    });
+    }, (error) => { console.error("Firestore listen error:", error); });
   },
   
   pushState: async () => {
@@ -731,7 +778,6 @@ const net = {
        state.isMulti = true;
        document.getElementById('rejoin-banner').style.display = 'none';
        net.listenRoom(state.roomId);
-       // The listener will automatically redirect to the correct screen based on sync.status
     }
   }
 };
@@ -826,8 +872,6 @@ const game = {
   
   renderAlpha: () => {
     const grid = document.getElementById('alpha-grid'); grid.innerHTML = '';
-    
-    // 내 차례가 아니면 키보드 비활성화
     const isMyTurn = !state.isMulti || (state.sync.currentTeam === state.myTeamIdx);
     grid.className = isMyTurn ? 'alphabet-grid' : 'alphabet-grid disabled';
     
@@ -891,7 +935,7 @@ const game = {
   },
   
   guess: async (letter) => {
-    if (state.isMulti && state.sync.currentTeam !== state.myTeamIdx) return; // 내턴 아님
+    if (state.isMulti && state.sync.currentTeam !== state.myTeamIdx) return;
     if (state.sync.guessed.includes(letter)) return;
     
     state.sync.guessed.push(letter);
@@ -900,7 +944,6 @@ const game = {
     if (inWord) {
       game.renderWord(); game.renderAlpha();
       if (state.sync.current.w.split('').every(c => c === ' ' || state.sync.guessed.includes(c))) {
-        // 승리
         if (state.isMulti) state.sync.scores[state.sync.currentTeam]++;
         state.sync.status = 'result';
         if (state.isMulti) await net.pushState(); else game.showResultUI(true);
@@ -911,7 +954,6 @@ const game = {
       state.sync.wrong++;
       game.renderHangman(); game.renderLives(); game.renderAlpha();
       if (state.sync.wrong >= state.sync.maxWrong) {
-        // 패배
         state.sync.status = 'result';
         if (state.isMulti) await net.pushState(); else game.showResultUI(false);
       } else {
@@ -934,7 +976,7 @@ const game = {
     const waitingMsg = document.getElementById('waiting-next-msg');
     
     if (state.isMulti) {
-      if (state.mode === 'host') { // 호스트만 다음 단어 조작 가능
+      if (state.mode === 'host') { 
         nextBtn.style.display = 'block';
         nextBtn.textContent = remaining > 0 ? '다음 단어 진행하기 →' : '최종 결과 보기';
         waitingMsg.style.display = 'none';
@@ -951,14 +993,18 @@ const game = {
     
     document.getElementById('result-overlay').classList.add('show');
     
-    // 시트 저장 (1v1 또는 솔로일 때, 시트 URL이 존재하면 실행)
-    if ((!state.isMulti || state.sync.multiType === '1v1') && cfg.sheetUrl) {
-      const elapsed = Math.round((Date.now() - state.startTime) / 1000);
-      const statusEl = document.getElementById('sheet-save-status');
-      statusEl.textContent = '기록 저장 중...';
-      sheet.logResultToSheet(state.sync.current.w, won, state.sync.wrong, elapsed).then(() => {
-        statusEl.textContent = '✓ 선생님께 기록이 전송되었습니다';
-      }).catch(() => { statusEl.textContent = '⚠ 기록 전송에 실패했습니다'; });
+    // 🔥 매 라운드 결과 Firebase 기록 저장
+    const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+    const statusEl = document.getElementById('sheet-save-status');
+    
+    // 호스트이거나 개인전(solo)일 때만 기록해서 중복 기록 방지
+    if (!state.isMulti || state.mode === 'host') {
+      statusEl.textContent = '클라우드에 결과 기록 중...';
+      settings.logResultToCloud(state.sync.current.w, won, state.sync.wrong, elapsed)
+        .then(() => { statusEl.textContent = '✓ 선생님 기록판에 자동 저장됨'; })
+        .catch(() => { statusEl.textContent = '⚠ 기록 전송에 실패했습니다'; });
+    } else {
+       statusEl.textContent = '호스트가 결과를 기록 중입니다.';
     }
   },
   
@@ -987,23 +1033,28 @@ const game = {
     document.getElementById('next-btn').style.display = 'none';
     document.getElementById('waiting-next-msg').style.display = 'none';
     document.getElementById('sheet-save-status').textContent = '';
-    ui.clearRejoin(false); // 게임이 끝나면 재접속 데이터 자동 파기
+    ui.clearRejoin(false); 
   }
 };
 
 // --- UI / 로컬 설정 로직 ---
 const ui = {
-  showScreen: (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
+  showScreen: (id) => { 
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    
+    // 결과 화면은 넓게 표시
+    if (id === 'screen-results') document.getElementById('app').classList.add('wide-mode');
+    else document.getElementById('app').classList.remove('wide-mode');
+  },
   
   resetNetworkUI: () => {
-    // 호스트 초기화
     document.getElementById('btn-create-room').style.display = 'block';
     document.getElementById('btn-create-room').disabled = false;
     document.getElementById('btn-create-room').textContent = '방 생성하기';
     document.getElementById('host-waiting-area').style.display = 'none';
     document.getElementById('host-err').textContent = '';
 
-    // 게스트 초기화
     document.getElementById('guest-step1').style.display = 'block';
     document.getElementById('guest-step2').style.display = 'none';
     document.getElementById('guest-waiting-area').style.display = 'none';
@@ -1019,6 +1070,7 @@ const ui = {
   goHome: () => {
     if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
     ui.resetNetworkUI();
+    document.getElementById('result-overlay').classList.remove('show');
     ui.showScreen('screen-home');
   },
   
@@ -1067,7 +1119,6 @@ const ui = {
     
     activeUnits.forEach((u, i) => {
       const btn = document.createElement('button'); btn.className = 'unit-btn';
-      // 커스텀 단원인 경우 뱃지를 달아줌
       const titleNum = (u.num && u.num.includes('Unit')) ? u.num : `🌟 커스텀`;
       btn.innerHTML = `<span class="unit-num">${titleNum}</span>${u.title}`;
       btn.onclick = () => game.start(i); grid.appendChild(btn);
@@ -1080,32 +1131,53 @@ const ui = {
     }
   },
 
-  // 재접속 로직
-  saveRejoinData: () => {
-    sessionStorage.setItem('hm_rejoin', JSON.stringify({ roomId: state.roomId, myTeamIdx: state.myTeamIdx, mode: state.mode }));
-  },
-  clearRejoin: (hideBanner) => {
-    sessionStorage.removeItem('hm_rejoin');
-    if (hideBanner) document.getElementById('rejoin-banner').style.display = 'none';
-  },
-  checkRejoin: () => {
-    if (sessionStorage.getItem('hm_rejoin')) {
-      document.getElementById('rejoin-banner').style.display = 'flex';
+  saveRejoinData: () => { sessionStorage.setItem('hm_rejoin', JSON.stringify({ roomId: state.roomId, myTeamIdx: state.myTeamIdx, mode: state.mode })); },
+  clearRejoin: (hideBanner) => { sessionStorage.removeItem('hm_rejoin'); if (hideBanner) document.getElementById('rejoin-banner').style.display = 'none'; },
+  checkRejoin: () => { if (sessionStorage.getItem('hm_rejoin')) { document.getElementById('rejoin-banner').style.display = 'flex'; } },
+
+  // 결과 현황판 호출
+  showResults: async () => {
+    document.getElementById('teacher-panel').classList.remove('open');
+    ui.showScreen('screen-results');
+    
+    const tbody = document.getElementById('results-tbody');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">데이터를 불러오는 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px; vertical-align:middle;"></div></td></tr>';
+    
+    const results = await settings.fetchResults();
+    
+    if (results.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--color-text-secondary);">아직 저장된 게임 기록이 없습니다.</td></tr>';
+      return;
     }
+    
+    tbody.innerHTML = '';
+    results.forEach(r => {
+      const tr = document.createElement('tr');
+      const badgeClass = r.correct === 'O' ? 'badge o' : 'badge x';
+      tr.innerHTML = `
+        <td style="font-size:11px; color:var(--color-text-secondary);">${r.dateString}</td>
+        <td><span style="font-size:11px; font-weight:600;">${r.mode}</span></td>
+        <td>${r.unit}</td>
+        <td style="font-weight:600; color:var(--primary);">${r.player}</td>
+        <td style="font-weight:700;">${r.word.toUpperCase()}</td>
+        <td><span class="${badgeClass}">${r.correct === 'O' ? '성공' : '실패'}</span></td>
+        <td>${r.wrongCount}번</td>
+        <td>${r.elapsed}초</td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
 };
 
-// --- Google Sheets 및 로컬 파싱 로직 ---
-const sheet = {
+// --- Firebase 자체 저장 및 설정 로직 (Google Sheets 대체) ---
+const settings = {
   saveLocal: () => { try { localStorage.setItem('hangman_cfg', JSON.stringify(cfg)); } catch (e) {} },
-  loadLocal: () => { try { const s = localStorage.getItem('hangman_cfg'); if (s) { const p = JSON.parse(s); Object.assign(cfg, p); } } catch (e) {} sheet.applyToPanel(); },
+  loadLocal: () => { try { const s = localStorage.getItem('hangman_cfg'); if (s) { const p = JSON.parse(s); Object.assign(cfg, p); } } catch (e) {} settings.applyToPanel(); },
   
   applyToPanel: () => {
     document.getElementById('cfg-maxwrong').value = cfg.maxWrong; 
     document.getElementById('cfg-hint').value = cfg.hint;
-    document.getElementById('sheet-url').value = cfg.sheetUrl || '';
     
-    // customUnits 복원하여 textarea에 출력
     if (cfg.customUnits && cfg.customUnits.length > 0) {
        let str = '';
        cfg.customUnits.forEach(u => {
@@ -1117,15 +1189,12 @@ const sheet = {
     } else {
        document.getElementById('cfg-words').value = '';
     }
-    document.getElementById('connect-badge').innerHTML = cfg.sheetUrl ? '<span class="connected-badge">✓ 연결됨</span>' : '';
   },
   
   readFromPanel: () => {
     cfg.maxWrong = parseInt(document.getElementById('cfg-maxwrong').value) || 6; 
     cfg.hint = document.getElementById('cfg-hint').value;
-    cfg.sheetUrl = document.getElementById('sheet-url').value.trim();
     
-    // 커스텀 단원 파싱 로직 (# 태그 지원)
     cfg.customUnits = [];
     const raw = document.getElementById('cfg-words').value.trim();
     if(raw) {
@@ -1137,7 +1206,6 @@ const sheet = {
             if(!t) continue;
             
             if(t.startsWith('#')) {
-                // 기존 모인 단어가 있으면 푸시하고 새로 시작
                 if(currentWords.length > 0) { cfg.customUnits.push({num:"", title: currentTitle, words: currentWords}); }
                 currentTitle = t.substring(1).trim();
                 currentWords = [];
@@ -1146,40 +1214,118 @@ const sheet = {
                 if(p[0]) currentWords.push({w: p[0].trim().toLowerCase(), h: (p[1]||'').trim()});
             }
         }
-        // 마지막 단원 푸시
         if(currentWords.length > 0) { cfg.customUnits.push({num:"", title: currentTitle, words: currentWords}); }
     }
   },
   
   setStatus: (msg, ok) => { const el = document.getElementById('panel-status'); el.textContent = msg; el.style.color = ok === true ? 'var(--success)' : ok === false ? 'var(--danger)' : 'var(--color-text-secondary)'; },
   
-  fetchJSONP: (params) => {
-    return new Promise((resolve, reject) => {
-      const url = cfg.sheetUrl; if (!url) { reject(new Error('URL 없음')); return; }
-      const cbName = '_sheetCb_' + Date.now(); const qs = new URLSearchParams({ ...params, callback: cbName }).toString();
-      const script = document.createElement('script');
-      const timer = setTimeout(() => { delete window[cbName]; document.body.removeChild(script); reject(new Error('timeout')); }, 8000);
-      window[cbName] = (data) => { clearTimeout(timer); delete window[cbName]; document.body.removeChild(script); resolve(data); };
-      script.src = url + '?' + qs; script.onerror = () => { clearTimeout(timer); delete window[cbName]; document.body.removeChild(script); reject(new Error('스크립트 로드 실패')); };
-      document.body.appendChild(script);
-    });
-  },
-  testConnection: async () => { sheet.readFromPanel(); if (!cfg.sheetUrl) { sheet.setStatus('URL을 먼저 입력하세요', false); return; } sheet.setStatus('연결 확인 중...', null); try { const d = await sheet.fetchJSONP({ action: 'ping' }); if (d && d.ok) { sheet.setStatus('✓ 연결 성공!', true); sheet.applyToPanel(); } else { sheet.setStatus('응답 오류', false); } } catch (e) { sheet.setStatus('연결 실패', false); } },
-  loadFromSheet: async () => { sheet.readFromPanel(); if (!cfg.sheetUrl) { sheet.setStatus('URL을 먼저 입력하세요', false); return; } sheet.setStatus('불러오는 중...', null); try { const d = await sheet.fetchJSONP({ action: 'loadConfig' }); if (d.maxWrong) cfg.maxWrong = Number(d.maxWrong); if (d.hint) cfg.hint = d.hint; if (d.customUnits) { try { cfg.customUnits = JSON.parse(d.customUnits); } catch (e) {} } sheet.applyToPanel(); sheet.setStatus('✓ 시트에서 설정 불러오기 완료', true); } catch (e) { sheet.setStatus('불러오기 실패', false); } },
   saveSettings: async () => { 
-    sheet.readFromPanel(); sheet.saveLocal(); sheet.applyToPanel(); ui.renderUnits(); // 단원 즉시 재렌더링
-    if (cfg.sheetUrl) { 
-      sheet.setStatus('시트에 저장 중...', null); 
-      try { const d = await sheet.fetchJSONP({ action: 'saveConfig', maxWrong: cfg.maxWrong, hint: cfg.hint, customUnits: JSON.stringify(cfg.customUnits) }); if (d && d.ok) sheet.setStatus('✓ 시트 + 로컬 모두 저장됨', true); else sheet.setStatus('시트 저장 실패', false); } catch (e) { sheet.setStatus('로컬만 저장됨', false); } 
-    } else { sheet.setStatus('✓ 로컬에 저장됨', true); } 
+    settings.readFromPanel(); settings.saveLocal(); settings.applyToPanel(); ui.renderUnits();
+    
+    if (db) {
+      settings.setStatus('서버 저장 중...', null);
+      try {
+        const configRef = !isExternalEnv ? doc(db, 'artifacts', appId, 'public', 'data', 'hangman_config', 'global') : doc(db, 'hangman_config', 'global');
+        await setDoc(configRef, cfg);
+        settings.setStatus('✓ 클라우드 서버에 저장 완료! (모든 접속자에게 적용됨)', true);
+      } catch(e) { 
+        console.error(e); 
+        settings.setStatus('서버 저장 실패', false);
+      }
+    }
+  },
+
+  // 결과 수집을 위한 Collection 참조
+  getResultsRef: () => {
+     return !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_results') : collection(db, 'hangman_results');
   },
   
-  logResultToSheet: async (word, correct, wrongCount, elapsed) => {
-    if (!cfg.sheetUrl) return; 
-    const s = state.student; 
-    let unitTitle = "커스텀";
-    if (state.sync.unit !== -1 && getActiveUnits()[state.sync.unit]) unitTitle = getActiveUnits()[state.sync.unit].title;
-    try { await sheet.fetchJSONP({ action: 'logResult', grade: s.grade, cls: s.cls, num: s.num, name: s.name, mode: state.mode, unit: unitTitle, word: word, correct: correct ? 'O' : 'X', wrongCount: wrongCount, elapsed: elapsed, timestamp: new Date().toISOString() }); } catch (e) {}
+  // 개별 라운드 결과를 Firestore에 저장
+  logResultToCloud: async (word, correct, wrongCount, elapsed) => {
+    if (!db) return;
+    
+    let unitTitle = "단원 미상";
+    if (state.sync.unit !== -1 && getActiveUnits()[state.sync.unit]) {
+      unitTitle = getActiveUnits()[state.sync.unit].title;
+    } else if (state.sync.unit === -1) {
+      unitTitle = "전체 단어 섞기";
+    }
+
+    let modeName = state.mode;
+    let playerName = "알 수 없음";
+
+    if (state.isMulti && state.sync.multiType === 'team') {
+       modeName = "멀티 팀 대항전";
+       playerName = `[팀전] ${state.sync.teams.join(' vs ')}`;
+    } else if (state.isMulti && state.sync.multiType === '1v1') {
+       modeName = "멀티 1:1 개인전";
+       playerName = state.sync.teams[state.sync.currentTeam] + " (팀" + (state.sync.currentTeam+1) + ")";
+    } else {
+       modeName = "솔로 모드";
+       const s = state.student;
+       playerName = `${s.grade}학년 ${s.cls}반 ${s.num}번 ${s.name}`;
+    }
+
+    try {
+       await addDoc(settings.getResultsRef(), {
+          timestamp: Date.now(),
+          dateString: new Date().toLocaleString(),
+          mode: modeName,
+          unit: unitTitle,
+          player: playerName,
+          word: word,
+          correct: correct ? 'O' : 'X',
+          wrongCount: wrongCount,
+          elapsed: elapsed
+       });
+    } catch(e) { console.error("결과 저장 실패", e); throw e; }
+  },
+
+  // 결과 현황판 데이터 가져오기
+  fetchResults: async () => {
+    if (!db) return [];
+    try {
+      const snap = await getDocs(settings.getResultsRef());
+      let results = [];
+      snap.forEach(doc => results.push(doc.data()));
+      // 최신순으로 자바스크립트 메모리 상에서 정렬
+      results.sort((a,b) => b.timestamp - a.timestamp); 
+      return results;
+    } catch (e) {
+      console.error(e);
+      alert("데이터를 가져오는 중 오류가 발생했습니다.");
+      return [];
+    }
+  },
+
+  // CSV 다운로드 기능
+  downloadCSV: async () => {
+    const results = await settings.fetchResults();
+    if (results.length === 0) {
+      alert("다운로드할 데이터가 없습니다."); return;
+    }
+
+    // 엑셀에서 한글이 깨지지 않도록 BOM 추가
+    let csv = "\uFEFF"; 
+    csv += "날짜 및 시간,모드,단원명,학생 정보/팀,단어,성공 여부,틀린 횟수,소요 시간(초)\n";
+    
+    results.forEach(r => {
+        // 내부 쉼표 처리를 위해 따옴표 감싸기
+        const playerStr = r.player ? r.player.replace(/"/g, '""') : '';
+        const wordStr = r.word ? r.word.replace(/"/g, '""') : '';
+        const correctStr = r.correct === 'O' ? '성공' : '실패';
+        
+        csv += `"${r.dateString}","${r.mode}","${r.unit}","${playerStr}","${wordStr}","${correctStr}","${r.wrongCount}","${r.elapsed}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `행맨_게임결과_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 };
 
@@ -1187,9 +1333,9 @@ const sheet = {
 window.ui = ui;
 window.net = net;
 window.game = game;
-window.sheet = sheet;
+window.settings = settings;
 
-sheet.loadLocal();
+settings.loadLocal();
 ui.renderUnits();
 </script>
 </body>

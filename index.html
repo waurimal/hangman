@@ -232,12 +232,9 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <input type="range" id="bgm-volume" class="bgm-slider" min="0" max="1" step="0.05" value="0.2" oninput="ui.changeVolume(this.value)" title="볼륨 조절">
 </div>
 
-<!-- 오디오 태그 (아이폰/사파리 및 CORS 문제 해결을 위해 HTML 요소로 삽입) -->
-<audio id="bgmAudio" loop preload="none">
-  <!-- 메인 무료 게임 배경음악 MP3 -->
-  <source src="https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3" type="audio/mpeg">
-  <!-- Fallback용 OGG 파일 -->
-  <source src="https://upload.wikimedia.org/wikipedia/commons/3/34/Kevin_MacLeod_-_Pixel_Peeker_Polka_-_faster.ogg" type="audio/ogg">
+<!-- 오디오 태그 (신뢰도 높은 mp3 소스로 교체) -->
+<audio id="bgmAudio" loop preload="auto">
+  <source src="https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3" type="audio/mpeg">
 </audio>
 
 <div id="app">
@@ -483,7 +480,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
             <th>단원명</th>
             <th>학생 정보 / 팀</th>
             <th>맞춘 단어</th>
-            <th>성 여부</th>
+            <th>성공 여부</th>
             <th>틀린 횟수</th>
             <th>소요 시간</th>
           </tr>
@@ -647,30 +644,41 @@ window.ui.toggleBGM = () => {
       btn.innerHTML = '🔇 BGM OFF';
       isBgmOn = false;
    } else {
+      // 볼륨 설정
       bgmAudio.volume = parseFloat(document.getElementById('bgm-volume').value) || 0.2;
-      bgmAudio.play().then(() => {
+      
+      // 재생 시도 (사용자 인터랙션 이후에만 가능)
+      bgmAudio.play()
+        .then(() => {
           btn.innerHTML = '🎵 BGM ON';
           isBgmOn = true;
-          if(bgmAudio.volume === 0) {
-             bgmAudio.volume = 0.2;
-             document.getElementById('bgm-volume').value = 0.2;
+          // 볼륨 슬라이더가 0이면 최소한으로 들리게 조정
+          if (bgmAudio.volume === 0) {
+              bgmAudio.volume = 0.1;
+              document.getElementById('bgm-volume').value = 0.1;
           }
-      }).catch(e => {
+        })
+        .catch(e => {
           console.error('Audio play failed:', e);
-          alert("소리 자동재생이 브라우저에 의해 차단되었습니다. 화면 빈 곳을 한 번 클릭한 뒤 다시 켜주세요.");
+          alert("소리 재생을 위해 화면 빈 곳을 한 번 클릭한 뒤 다시 켜주세요.");
           btn.innerHTML = '🔇 BGM OFF';
           isBgmOn = false;
-      });
+        });
    }
 };
 
 // 볼륨 슬라이더 조절 이벤트
 window.ui.changeVolume = (val) => {
    const bgmAudio = document.getElementById('bgmAudio');
+   const btn = document.getElementById('bgm-toggle');
    bgmAudio.volume = parseFloat(val);
-   if (val == 0 && isBgmOn) {
-       ui.toggleBGM();
-   } else if (val > 0 && !isBgmOn) {
+   
+   if (parseFloat(val) === 0) {
+       bgmAudio.pause();
+       btn.innerHTML = '🔇 BGM OFF';
+       isBgmOn = false;
+   } else if (!isBgmOn) {
+       // 볼륨을 올렸을 때 꺼져있다면 켜기 시도
        ui.toggleBGM();
    }
 };

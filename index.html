@@ -347,7 +347,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
         <div id="host-waiting-area" style="display:none; text-align:center; margin-top:10px;">
           <div style="font-size:13px; color:var(--color-text-secondary); font-weight:600;">초대 코드</div>
           <div class="room-code-display" id="display-room-code">----</div>
-          <div style="font-size:13px; color:var(--primary); font-weight:600;">상대방(게스트)의 접속을 기다리는 중...</div>
+          <div id="host-waiting-msg" style="font-size:13px; color:var(--primary); font-weight:600;">상대방(게스트)의 접속을 기다리는 중...</div>
           <div class="loader"></div>
         </div>
       </div>
@@ -830,9 +830,17 @@ const net = {
       
       if (state.mode.startsWith('host') && state.sync.status === 'waiting') {
         const joinedCount = state.sync.teams.filter(t => t !== '').length;
-        if (joinedCount > 1) { // 1명 이상 참가 시 단원 선택으로 이동 가능
+        const totalTeams = state.sync.teams.length;
+        
+        if (joinedCount === totalTeams) { // 설정한 팀이 모두 참가했을 때만 단원 선택으로 넘어감
           ui.showScreen('screen-unit');
-          document.getElementById('unit-subtitle').textContent = `현재 ${joinedCount}/${state.sync.teams.length}팀 참가 중! 단원을 선택해 시작하세요.`;
+          document.getElementById('unit-subtitle').textContent = `모든 팀(${totalTeams}팀)이 참가했습니다! 단원을 선택해 시작하세요.`;
+        } else {
+          // 호스트 화면에 참가 현황 실시간 업데이트
+          const waitMsg = document.getElementById('host-waiting-msg');
+          if (waitMsg) {
+            waitMsg.textContent = `현재 ${joinedCount}/${totalTeams}팀 참가 완료... 남은 팀의 접속을 기다리는 중입니다.`;
+          }
         }
       }
       else if (state.mode === 'guest' && state.sync.status === 'playing') {
@@ -1201,6 +1209,9 @@ const ui = {
   },
   
   resetNetworkUI: () => {
+    const hostMsgEl = document.getElementById('host-waiting-msg');
+    if (hostMsgEl) hostMsgEl.textContent = '상대방(게스트)의 접속을 기다리는 중...';
+
     document.getElementById('btn-create-room').style.display = 'block';
     document.getElementById('btn-create-room').disabled = false;
     document.getElementById('btn-create-room').textContent = '방 생성하기';

@@ -213,16 +213,26 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 @keyframes spin { to { transform: rotate(360deg); } }
 .room-code-display { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 4px; text-align: center; margin: 15px 0; background: #e0e7ff; padding: 10px; border-radius: 12px; }
 
-/* BGM 버튼 */
-.bgm-btn { position: absolute; top: 15px; right: 15px; z-index: 100; font-size: 11px; padding: 4px 10px; }
+/* BGM 컨트롤 (좌측 하단 플로팅) */
+.bgm-container { position: fixed; bottom: 20px; left: 20px; z-index: 200; display: flex; align-items: center; gap: 8px; background: #ffffff; padding: 10px 16px; border-radius: 99px; box-shadow: var(--shadow-lg); border: 1px solid var(--color-border); transition: all 0.2s; }
+.bgm-container:hover { transform: translateY(-3px); border-color: var(--primary); }
+.bgm-btn { border: none; background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--color-text-secondary); transition: color 0.2s; padding: 0; outline: none; }
+.bgm-btn:hover { color: var(--primary); }
+.bgm-slider { width: 60px; height: 4px; border-radius: 2px; -webkit-appearance: none; background: #e2e8f0; outline: none; cursor: pointer; }
+.bgm-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); cursor: pointer; transition: transform 0.1s; }
+.bgm-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.bgm-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); cursor: pointer; border: none; }
 </style>
 </head>
 <body>
 
+<!-- BGM 플로팅 컨트롤 -->
+<div class="bgm-container">
+  <button id="bgm-toggle" class="bgm-btn" onclick="ui.toggleBGM()">🔇 BGM OFF</button>
+  <input type="range" id="bgm-volume" class="bgm-slider" min="0" max="1" step="0.05" value="0.2" oninput="ui.changeVolume(this.value)" title="볼륨 조절">
+</div>
+
 <div id="app">
-  <!-- 배경음악 토글 버튼 -->
-  <button id="bgm-toggle" class="btn-ghost bgm-btn" onclick="ui.toggleBGM()">🔇 BGM OFF</button>
-  
   <!-- 1. 홈 화면 -->
   <div id="screen-home" class="screen active">
     <!-- 재접속 배너 -->
@@ -487,7 +497,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <select id="lb-mode-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="ui.updateLeaderboardTable()">
-          <option value="전체 모드">모든 게임 모드</option>
           <option value="1인 플레이">1인 플레이</option>
           <option value="1:1 개인전">1:1 개인전</option>
           <option value="단체전">단체전</option>
@@ -633,8 +642,26 @@ window.ui.toggleBGM = () => {
    } else {
       bgmAudio.play().catch(e => console.log('Audio play failed (browser autoplay policy):', e));
       btn.innerHTML = '🎵 BGM ON';
+      
+      // 볼륨이 0인 상태에서 재생을 누르면 기본 소리로 살짝 올려줌
+      if(bgmAudio.volume === 0) {
+         bgmAudio.volume = 0.2;
+         document.getElementById('bgm-volume').value = 0.2;
+      }
    }
    isBgmOn = !isBgmOn;
+};
+
+// 볼륨 슬라이더 조절 이벤트
+window.ui.changeVolume = (val) => {
+   bgmAudio.volume = parseFloat(val);
+   // 볼륨을 0으로 내리면 아이콘 끄기
+   if (val == 0 && isBgmOn) {
+       ui.toggleBGM();
+   } else if (val > 0 && !isBgmOn) {
+       // 볼륨을 올렸을 때 브라우저 정책이 허용한다면 자동 재생
+       ui.toggleBGM();
+   }
 };
 
 // --- 키보드 타이핑 이벤트 바인딩 ---
@@ -1381,7 +1408,7 @@ window.ui.showStudentLeaderboard = async () => {
        unitSelect.appendChild(opt);
     });
     
-    document.getElementById('lb-mode-select').value = '전체 모드'; // 팝업 열 때 모드 초기화
+    document.getElementById('lb-mode-select').value = '1인 플레이'; // 팝업 열 때 모드 초기화
 
     document.getElementById('leaderboard-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">기록을 불러오는 중입니다... <div class="loader" style="width:14px; height:14px; border-width:2px; vertical-align:middle;"></div></td></tr>';
     
@@ -1394,13 +1421,9 @@ window.ui.updateLeaderboardTable = () => {
     const selectedMode = document.getElementById('lb-mode-select').value;
     const tbody = document.getElementById('leaderboard-tbody');
     
-    // 단원 및 진행 모드 필터링 후 점수 내림차순 정렬
+    // 단원 및 진행 모드 완벽 일치 조건으로 필터링
     let filtered = ui.cachedLeaderboardData.filter(r => {
-        let match = (r.unit === selectedUnit);
-        if (selectedMode !== '전체 모드') {
-            match = match && (r.mode === selectedMode);
-        }
-        return match;
+        return (r.unit === selectedUnit) && (r.mode === selectedMode);
     });
     filtered.sort((a, b) => b.score - a.score);
     

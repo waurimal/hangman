@@ -37,19 +37,21 @@
 
 body {
   font-family: var(--font-sans); background: var(--bg-body); color: var(--color-text-primary);
-  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem;
+  /* 위쪽 여백을 줄여 전체적으로 위로 올라가게 조정 */
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 1.5rem 1rem;
 }
 
 #app {
-  width: 100%; max-width: 500px; min-height: 600px; background: var(--bg-card);
+  width: 100%; max-width: 500px; min-height: 550px; background: var(--bg-card);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.6); border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-float); padding: 2.5rem 1.5rem; position: relative;
+  box-shadow: var(--shadow-float); padding: 2rem 1.5rem; position: relative;
   overflow: hidden; display: flex; flex-direction: column; transition: max-width 0.3s ease, padding 0.3s ease;
+  margin-top: 1rem; /* 앱 컨테이너 위쪽 마진 */
 }
 
-/* 넓은 화면용(게임창, 결과창)을 위한 클래스 */
-#app.wide-mode { max-width: 800px; padding-top: 1.5rem; }
+/* 넓은 화면용(게임창, 결과창)을 가로로 더 길게 확장 (800px -> 950px) */
+#app.wide-mode { max-width: 950px; padding-top: 1.5rem; }
 
 /* 푸터 (제작자 정보) */
 .app-footer {
@@ -61,10 +63,10 @@ body {
 
 .screen { display: none; opacity: 0; flex: 1; }
 .screen.active { display: flex; flex-direction: column; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-@keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-h1 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 0.25rem; letter-spacing: -0.5px; color: var(--primary); }
-.subtitle { font-size: 14px; color: var(--color-text-secondary); text-align: center; margin-bottom: 2rem; font-weight: 600; }
+h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25rem; letter-spacing: -0.5px; color: var(--primary); }
+.subtitle { font-size: 14px; color: var(--color-text-secondary); text-align: center; margin-bottom: 1.5rem; font-weight: 600; }
 
 .btn-primary {
   display: block; width: 100%; padding: 0.8rem 1.5rem; background: linear-gradient(to right, var(--primary), #6366f1);
@@ -110,33 +112,35 @@ h1 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .student-card, .room-card { background: #ffffff; border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-md); margin-bottom: 2rem;}
 .student-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-.game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .game-header .meta { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); background: rgba(0,0,0,0.05); padding: 6px 12px; border-radius: 99px;}
 .turn-badge { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 99px; background: #e0e7ff; color: var(--primary); transition: 0.3s; }
 .turn-badge.my-turn { background: var(--success); color: white; animation: pulse 2s infinite; }
 .turn-badge.wait-turn { background: #f1f5f9; color: var(--color-text-secondary); }
 
-/* 게임 가로 레이아웃 설정 */
-.game-layout { display: grid; grid-template-columns: 240px 1fr; gap: 30px; align-items: start; margin-bottom: 1rem;}
-@media (max-width: 600px) {
+/* 게임 가로 레이아웃 설정 (더 넓게 조정) */
+.game-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; margin-bottom: 1rem;}
+@media (max-width: 650px) {
   .game-layout { grid-template-columns: 1fr; gap: 20px; }
   .hangman-wrap { max-width: 220px; margin: 0 auto; }
 }
 
-.hangman-wrap { background: #ffffff; border-radius: var(--border-radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
-.hangman-svg { width: 100%; height: auto; max-height: 200px; }
+.hangman-wrap { background: #ffffff; border-radius: var(--border-radius-lg); padding: 25px 20px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
+.hangman-svg { width: 100%; height: auto; max-height: 220px; }
 .lives-bar { display: flex; gap: 4px; justify-content: center; margin-top: 15px; }
 .heart { font-size: 16px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
 
-.hint-box { font-size: 14px; font-weight: 600; color: var(--primary); background: #e0e7ff; border-radius: var(--border-radius-md); padding: 10px 15px; margin-bottom: 20px; text-align: center; }
+.info-col { padding: 10px 0; }
+.hint-box { font-size: 14px; font-weight: 600; color: var(--primary); background: #e0e7ff; border-radius: var(--border-radius-md); padding: 12px 15px; margin-bottom: 25px; text-align: center; }
 
-.word-display { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; justify-content: center; min-height: 40px;}
-.letter-box { width: 36px; height: 46px; border-bottom: 4px solid var(--color-text-primary); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; text-transform: uppercase; }
+/* 단어칸 및 알파벳 버튼 크기 확대 */
+.word-display { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 35px; justify-content: center; min-height: 50px;}
+.letter-box { width: 40px; height: 52px; border-bottom: 4px solid var(--color-text-primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; text-transform: uppercase; }
 .letter-box.space { border-bottom: none; width: 16px; }
 
-.alphabet-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; transition: opacity 0.3s; }
+.alphabet-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; transition: opacity 0.3s; }
 .alphabet-grid.disabled { opacity: 0.5; pointer-events: none; }
-.alpha-btn { width: 40px; height: 46px; border: 1px solid var(--color-border); border-radius: 8px; background: #ffffff; font-size: 18px; font-weight: 700; color: var(--color-text-primary); cursor: pointer; box-shadow: 0 4px 0 var(--color-border); transition: all 0.1s; }
+.alpha-btn { width: 46px; height: 52px; border: 1px solid var(--color-border); border-radius: 8px; background: #ffffff; font-size: 20px; font-weight: 700; color: var(--color-text-primary); cursor: pointer; box-shadow: 0 4px 0 var(--color-border); transition: all 0.1s; }
 .alpha-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
 .alpha-btn.correct { background: var(--success); border-color: #059669; color: white; box-shadow: 0 4px 0 #059669; }
 .alpha-btn.wrong { background: #f1f5f9; color: var(--color-text-tertiary); border-color: #e2e8f0; box-shadow: none; transform: translateY(4px); opacity: 0.7; }
@@ -216,8 +220,8 @@ h1 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       </div>
     </div>
     
-    <div style="margin: auto 0;">
-      <h1 style="font-family: monospace;">WORD HANGMAN RACE</h1>
+    <div style="margin: 0;">
+      <h1 style="font-family: monospace; font-size: 30px;">WORD HANGMAN RACE</h1>
       <p class="subtitle" style="font-size: 16px; color: var(--primary);">영어 단어 행맨 게임</p>
       
       <div class="mode-grid" style="margin-top: 2rem;">
@@ -497,6 +501,11 @@ h1 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   </select>
   <span class="panel-label" style="margin-top:16px;">📝 단원/단어장 (단어,뜻)</span>
   <textarea class="panel-textarea" id="cfg-words" placeholder="# 1단원: 과일&#10;apple,사과&#10;banana,바나나&#10;&#10;# 2단원: 동물&#10;dog,개&#10;cat,고양이"></textarea>
+  
+  <div style="border-top: 1px solid var(--color-border); margin: 15px 0;"></div>
+  <span class="panel-label">🔐 교사 모드 암호 변경</span>
+  <input class="panel-input" id="cfg-pwd" type="text" placeholder="새 암호 입력 (기본: 0000)"/>
+
   <button class="panel-btn" onclick="settings.saveSettings()" style="margin-top:16px;">단어 및 설정 저장 (클라우드 반영)</button>
   <div class="panel-status" id="panel-status"></div>
 </div>
@@ -508,10 +517,9 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const MAX_DEFAULT = 6;
-const TEACHER_PWD = "0000"; // 기본 교사 모드 암호
 
-// 설정 객체
-let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [] };
+// 설정 객체 (teacherPwd 추가)
+let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [], teacherPwd: '0000' };
 
 function getActiveUnits() {
   return (cfg.customUnits && cfg.customUnits.length > 0) ? cfg.customUnits : [];
@@ -1197,7 +1205,8 @@ const settings = {
     document.getElementById('pwd-overlay').classList.remove('show');
   },
   checkPassword: () => {
-    if (document.getElementById('teacher-pwd').value === TEACHER_PWD) {
+    const currentPwd = cfg.teacherPwd || "0000";
+    if (document.getElementById('teacher-pwd').value === currentPwd) {
       settings.closePasswordModal();
       document.getElementById('teacher-panel').classList.add('open');
     } else {
@@ -1213,6 +1222,7 @@ const settings = {
   applyToPanel: () => {
     document.getElementById('cfg-maxwrong').value = cfg.maxWrong; 
     document.getElementById('cfg-hint').value = cfg.hint;
+    document.getElementById('cfg-pwd').value = cfg.teacherPwd || '0000';
     
     if (cfg.customUnits && cfg.customUnits.length > 0) {
        let str = '';
@@ -1230,6 +1240,7 @@ const settings = {
   readFromPanel: () => {
     cfg.maxWrong = parseInt(document.getElementById('cfg-maxwrong').value) || 6; 
     cfg.hint = document.getElementById('cfg-hint').value;
+    cfg.teacherPwd = document.getElementById('cfg-pwd').value.trim() || '0000';
     
     cfg.customUnits = [];
     const raw = document.getElementById('cfg-words').value.trim();

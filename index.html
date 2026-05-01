@@ -1388,8 +1388,9 @@ window.ui.refreshResultsTable = async () => {
     const filter = all.filter(r => {
         let m = true;
         if (uF !== '전체') m = m && (r.unit === uF);
-        if (gF !== 'All') m = m && (r.grade == gF);
-        if (cF !== 'All') m = m && (r.cls == cF);
+        // 과거 데이터 하위 호환을 위해 player 텍스트 내 포함 여부도 검사합니다.
+        if (gF !== 'All') m = m && (r.grade == gF || (r.player && r.player.includes(gF + '학년')));
+        if (cF !== 'All') m = m && (r.cls == cF || (r.player && r.player.includes(cF + '반')));
         return m;
     });
 
@@ -1649,7 +1650,14 @@ window.settings.performResetResults = async () => {
     
     try {
         const all = await window.settings.fetchResults();
-        const toDel = all.filter(r => (u === '전체' || r.unit === u) && (g === 'All' || r.grade == g) && (c === 'All' || r.cls == c));
+        const toDel = all.filter(r => {
+            let m = true;
+            if (u !== '전체') m = m && (r.unit === u);
+            // 과거 데이터 하위 호환 검사
+            if (g !== 'All') m = m && (r.grade == g || (r.player && r.player.includes(g + '학년')));
+            if (c !== 'All') m = m && (r.cls == c || (r.player && r.player.includes(c + '반')));
+            return m;
+        });
         
         for (const item of toDel) {
             await deleteDoc(doc(db, window.settings.getResultsRef().path, item.id));
@@ -1669,7 +1677,15 @@ window.settings.downloadCSV = async () => {
     const gF = document.getElementById('res-grade-select').value; 
     const cF = document.getElementById('res-class-select').value;
     
-    const filter = all.filter(r => (uF === '전체' || r.unit === uF) && (gF === 'All' || r.grade == gF) && (cF === 'All' || r.cls == cF));
+    const filter = all.filter(r => {
+        let m = true;
+        if (uF !== '전체') m = m && (r.unit === uF);
+        // 과거 데이터 하위 호환 검사
+        if (gF !== 'All') m = m && (r.grade == gF || (r.player && r.player.includes(gF + '학년')));
+        if (cF !== 'All') m = m && (r.cls == cF || (r.player && r.player.includes(cF + '반')));
+        return m;
+    });
+    
     if (!filter.length) return alert("저장할 데이터가 없습니다.");
     
     let csv = "\uFEFF날짜 및 시간,진행 모드,단원명,학년,반,학생 이름(팀),맞춘 단어,성공 여부,틀린 횟수,소요 시간(초)\n";

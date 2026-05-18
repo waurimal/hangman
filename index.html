@@ -37,6 +37,7 @@
 
 body {
   font-family: var(--font-sans); background: var(--bg-body); color: var(--color-text-primary);
+  /* 위쪽 여백을 줄여 전체적으로 위로 올라가게 조정 */
   min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 1.5rem 1rem;
 }
 
@@ -46,11 +47,13 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.6); border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-float); padding: 2rem 1.5rem; position: relative;
   overflow: hidden; display: flex; flex-direction: column; transition: max-width 0.3s ease, padding 0.3s ease;
-  margin-top: 1rem;
+  margin-top: 1rem; /* 앱 컨테이너 위쪽 마진 */
 }
 
+/* 넓은 화면용(게임창, 결과창, 대시보드)을 가로로 더 길게 확장 */
 #app.wide-mode { max-width: 1000px; padding-top: 1.5rem; }
 
+/* 푸터 (제작자 정보) */
 .app-footer {
   margin-top: 1.5rem; text-align: center; font-size: 13px; font-weight: 600; color: var(--color-text-secondary); line-height: 1.6;
 }
@@ -96,6 +99,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .form-group input:focus, .form-group select:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
 .form-group input.upper { text-transform: uppercase; font-weight: bold; letter-spacing: 2px; text-align: center; }
 
+/* 메인 화면 1열, 2열 분리 그리드 */
 .home-top-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 600px; margin: 0 auto; }
 .home-bottom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 600px; margin: 12px auto 0; }
 @media (max-width: 550px) {
@@ -204,7 +208,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 .badge.o { background: #dcfce7; color: #166534; }
 .badge.x { background: #fee2e2; color: #991b1b; }
 
-.text-center { text-align: center; width: 100%; margin-top: 1rem;}
 .loader { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(79, 70, 229, 0.3); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; margin-top: 10px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .room-code-display { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 4px; text-align: center; margin: 15px 0; background: #e0e7ff; padding: 10px; border-radius: 12px; }
@@ -436,7 +439,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     <h1>학생 게임 결과 기록표 (교사용)</h1>
     <p class="subtitle" style="margin-bottom: 15px;">필터링된 데이터를 삭제하거나 CSV로 다운로드할 수 있습니다.</p>
     
-    <!-- 필터 및 제어 도구 -->
     <div style="display:flex; flex-wrap:wrap; gap:10px; background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; align-items:flex-end;">
        <div style="flex:1; min-width:150px;">
          <label style="font-size:11px; font-weight:700; color:var(--color-text-secondary);">단원 필터</label>
@@ -487,6 +489,16 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
           <option value="1인 플레이">1인 플레이</option><option value="1:1 개인전">1:1 개인전</option><option value="단체전">단체전</option>
         </select>
         <select id="lb-unit-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()"></select>
+        
+        <!-- 새로운 명예의 전당 필터: 학년, 반 -->
+        <select id="lb-grade-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()">
+          <option value="All">전체 학년</option>
+          <option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option>
+        </select>
+        <select id="lb-class-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()">
+          <option value="All">전체 반</option>
+          <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option><option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
+        </select>
       </div>
     </div>
     <div class="table-wrap">
@@ -499,7 +511,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 삭제 확인 모달 -->
   <div class="result-overlay" id="confirm-overlay">
     <div class="result-card" style="max-width: 350px;">
       <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
@@ -512,7 +523,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 교사 암호 모달 -->
   <div class="result-overlay" id="pwd-overlay">
     <div class="result-card" style="max-width: 300px;">
       <h3 style="margin-bottom:10px;">🔒 교사 모드</h3>
@@ -522,7 +532,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 게임 결과 모달 -->
   <div class="result-overlay" id="result-overlay">
     <div class="result-card">
       <div id="result-emoji" style="font-size:48px;"></div>
@@ -542,7 +551,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <div class="copyright">Copyright © 2026 Eui Elementary School. All Rights Reserved.</div>
 </div>
 
-<!-- 교사 설정 패널 -->
 <div class="teacher-panel" id="teacher-panel">
   <div class="panel-title">교사 관리 패널<button class="btn-ghost" style="padding:2px 8px; font-size:12px; border:none;" onclick="document.getElementById('teacher-panel').classList.remove('open')">✕ 닫기</button></div>
   <button class="panel-btn sec" onclick="window.ui.showResults()">📊 학생 라운드 결과 관리</button>
@@ -563,13 +571,11 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <div class="panel-status" id="panel-status"></div>
 </div>
 
-<!-- Firebase & 게임 로직 스크립트 -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// --- 오브젝트 전역 바인딩 (이벤트 리스너용) ---
 const ui = window.ui = window.ui || {};
 const net = window.net = window.net || {};
 const game = window.game = window.game || {};
@@ -599,7 +605,6 @@ let state = {
     scoreSaved: false
 };
 
-// --- BGM 제어 ---
 let isBgmOn = false;
 
 window.ui.toggleBGM = () => {
@@ -644,7 +649,6 @@ window.ui.changeVolume = (val) => {
     }
 };
 
-// --- 키보드 이벤트 바인딩 ---
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
     if (document.getElementById('pwd-overlay').classList.contains('show')) return;
@@ -667,7 +671,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// --- Firebase 초기화 ---
 let app, auth, db, user, appId, unsubscribeRoom = null;
 let isExternalEnv = false;
 
@@ -687,10 +690,7 @@ const initFirebase = async () => {
                 appId: "1:434551215608:web:89ff7a794553676128320d"
             };
 
-            if (myFirebaseConfig.apiKey === "YOUR_API_KEY") {
-                console.warn("개인 Firebase 설정이 없습니다.");
-                return; 
-            }
+            if (myFirebaseConfig.apiKey === "YOUR_API_KEY") { return; }
             appId = 'github-hosted-app';
             app = initializeApp(myFirebaseConfig);
         }
@@ -721,16 +721,13 @@ const initFirebase = async () => {
                     state.sync.hintMode = cfg.hint || 'korean';
                 }
             }
-        } catch(e) { console.error("설정 로드 에러:", e); }
+        } catch(e) {}
         
         window.ui.checkRejoin();
-    } catch(e) {
-        console.error("Firebase 초기화 에러:", e);
-    }
+    } catch(e) {}
 };
 initFirebase();
 
-// --- 네트워크 방 로직 ---
 window.net.getRoomRef = (roomId) => {
     return !isExternalEnv ? doc(db, 'artifacts', appId, 'public', 'data', 'hangman_rooms', roomId) : doc(db, 'hangman_rooms', roomId);
 };
@@ -786,7 +783,6 @@ window.net.createRoom = async () => {
         window.ui.saveRejoinData(); 
         window.net.listenRoom(roomId);
     } catch (e) {
-        console.error(e);
         errEl.textContent = "방 생성 실패. 권한 오류나 일시적 문제일 수 있습니다.";
         btn.disabled = false; btn.textContent = '방 생성하기';
     }
@@ -828,7 +824,6 @@ window.net.checkRoomCode = async () => {
         document.getElementById('guest-1v1-input').style.display = roomData.multiType === '1v1' ? 'block' : 'none';
 
     } catch(e) {
-        console.error(e);
         btn.disabled = false; errEl.textContent = "오류가 발생했습니다: " + e.message;
     }
 };
@@ -885,7 +880,6 @@ window.net.joinRoom = async () => {
         window.ui.saveRejoinData();
         window.net.listenRoom(roomId);
     } catch (e) {
-        console.error(e);
         btn.disabled = false; errEl.textContent = "입장 중 오류 발생: " + e.message;
     }
 };
@@ -933,7 +927,7 @@ window.net.listenRoom = (roomId) => {
         else if (state.sync.status === 'finished') {
             window.game.showFinalResultUI();
         }
-    }, (error) => { console.error("Firestore listen error:", error); });
+    });
 };
   
 window.net.pushState = async () => {
@@ -955,7 +949,6 @@ window.net.rejoinRoom = () => {
     }
 };
 
-// --- 게임 핵심 로직 ---
 window.game.getAllWords = () => { 
     let a = []; 
     getActiveUnits().forEach(u => a = a.concat(u.words)); 
@@ -1118,7 +1111,7 @@ window.game.renderHangman = () => {
         `<line x1="100" y1="95" x2="120" y2="120" stroke="${errorColor}" stroke-width="4" stroke-linecap="round"/>`
     ];
     let html = ''; 
-    for (let i = 0; i < 4; i++) html += p[i]; // 기본 구조물
+    for (let i = 0; i < 4; i++) html += p[i];
     
     const maxW = state.sync.maxWrong || 6;
     let partsToShow = 0;
@@ -1268,7 +1261,6 @@ window.game.showFinalResultUI = async () => {
     window.ui.clearRejoin(false); 
 };
 
-// --- UI Methods ---
 window.ui.showScreen = (id) => { 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
@@ -1375,7 +1367,6 @@ window.ui.saveRejoinData = () => { sessionStorage.setItem('hm_rejoin', JSON.stri
 window.ui.clearRejoin = (hideBanner) => { sessionStorage.removeItem('hm_rejoin'); if (hideBanner) document.getElementById('rejoin-banner').style.display = 'none'; };
 window.ui.checkRejoin = () => { if (sessionStorage.getItem('hm_rejoin')) { document.getElementById('rejoin-banner').style.display = 'flex'; } };
 
-// 결과 필터링 및 리셋(UI) 로직
 window.ui.refreshResultsTable = async () => {
     const tbody = document.getElementById('results-tbody');
     const uF = document.getElementById('res-unit-select').value;
@@ -1388,7 +1379,6 @@ window.ui.refreshResultsTable = async () => {
     const filter = all.filter(r => {
         let m = true;
         if (uF !== '전체') m = m && (r.unit === uF);
-        // 과거 데이터 하위 호환을 위해 player 텍스트 내 포함 여부도 검사합니다.
         if (gF !== 'All') m = m && (r.grade == gF || (r.player && r.player.includes(gF + '학년')));
         if (cF !== 'All') m = m && (r.cls == cF || (r.player && r.player.includes(cF + '반')));
         return m;
@@ -1431,6 +1421,8 @@ window.ui.showStudentLeaderboard = async () => {
     const sel = document.getElementById('lb-unit-select'); 
     sel.innerHTML = '<option value="전체 단어 섞기">전체 단어 섞기</option>' + getActiveUnits().map(u=>`<option value="${u.title}">${u.title}</option>`).join('');
     document.getElementById('lb-mode-select').value = '1인 플레이';
+    document.getElementById('lb-grade-select').value = 'All';
+    document.getElementById('lb-class-select').value = 'All';
     
     window.ui.cachedLeaderboardData = await window.settings.fetchLeaderboardData(); 
     window.ui.updateLeaderboardTable();
@@ -1439,9 +1431,18 @@ window.ui.showStudentLeaderboard = async () => {
 window.ui.updateLeaderboardTable = () => {
     const uF = document.getElementById('lb-unit-select').value;
     const mF = document.getElementById('lb-mode-select').value;
+    const gF = document.getElementById('lb-grade-select').value;
+    const cF = document.getElementById('lb-class-select').value;
     const tbody = document.getElementById('leaderboard-tbody');
     
-    let filter = window.ui.cachedLeaderboardData.filter(r => r.unit === uF && r.mode === mF).sort((a,b)=>b.score-a.score);
+    let filter = window.ui.cachedLeaderboardData.filter(r => {
+        let m = true;
+        if (r.unit !== uF) m = false;
+        if (r.mode !== mF) m = false;
+        if (gF !== 'All' && r.grade != gF && !(r.player && r.player.includes(gF + '학년'))) m = false;
+        if (cF !== 'All' && r.cls != cF && !(r.player && r.player.includes(cF + '반'))) m = false;
+        return m;
+    }).sort((a,b)=>b.score-a.score);
     
     if (!filter.length) { 
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--color-text-secondary);">해당 조건에 등록된 명예의 전당 기록이 없습니다.</td></tr>'; 
@@ -1473,7 +1474,6 @@ window.ui.updateLeaderboardTable = () => {
     `).join('');
 };
 
-// --- Settings & Leaderboard Logic ---
 window.settings.openPasswordModal = () => { 
     document.getElementById('teacher-pwd').value = ''; 
     document.getElementById('pwd-overlay').classList.add('show'); 
@@ -1564,7 +1564,7 @@ window.settings.logResultToCloud = async (w, c, wr, e) => {
     let modeName = state.mode.includes('team') ? '단체전' : (state.mode.includes('1v1') ? '1:1 개인전' : '1인 플레이');
     let p = "";
     if (state.isMulti && state.sync.multiType === 'team') {
-        p = state.sync.teams[state.sync.currentTeam] || "알 수 없는 팀";
+        p = `[팀전] ${state.sync.teams.filter(t=>t).join(' vs ')}`;
     } else if (state.isMulti && state.sync.multiType === '1v1') {
         p = state.sync.teams[state.sync.currentTeam] + " (진행자)";
     } else {
@@ -1629,7 +1629,6 @@ window.settings.fetchLeaderboardData = async () => {
     return res; 
 };
 
-// --- 필터 초기화(삭제) 로직 ---
 window.settings.confirmResetResults = () => {
     const u = document.getElementById('res-unit-select').value; 
     const g = document.getElementById('res-grade-select').value; 
@@ -1653,7 +1652,6 @@ window.settings.performResetResults = async () => {
         const toDel = all.filter(r => {
             let m = true;
             if (u !== '전체') m = m && (r.unit === u);
-            // 과거 데이터 하위 호환 검사
             if (g !== 'All') m = m && (r.grade == g || (r.player && r.player.includes(g + '학년')));
             if (c !== 'All') m = m && (r.cls == c || (r.player && r.player.includes(c + '반')));
             return m;
@@ -1680,7 +1678,6 @@ window.settings.downloadCSV = async () => {
     const filter = all.filter(r => {
         let m = true;
         if (uF !== '전체') m = m && (r.unit === uF);
-        // 과거 데이터 하위 호환 검사
         if (gF !== 'All') m = m && (r.grade == gF || (r.player && r.player.includes(gF + '학년')));
         if (cF !== 'All') m = m && (r.cls == cF || (r.player && r.player.includes(cF + '반')));
         return m;
@@ -1699,7 +1696,6 @@ window.settings.downloadCSV = async () => {
     l.click();
 };
 
-// --- 앱 초기화 실행 ---
 window.settings.loadLocal();
 window.ui.renderUnits();
 

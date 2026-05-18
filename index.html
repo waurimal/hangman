@@ -444,7 +444,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <!-- 7. 교사용 게임 결과 기록표 및 관리 -->
   <div id="screen-results" class="screen">
     <h1>학생 게임 결과 기록표 (교사용)</h1>
-    <!-- 서브타이틀과 설명을 '전체 게임 결과'임을 알 수 있게 변경 -->
     <p class="subtitle" style="margin-bottom: 15px;">게임 종료 시의 최종 게임 결과(총점 등)가 기록됩니다.</p>
     
     <div style="display:flex; flex-wrap:wrap; gap:10px; background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; align-items:flex-end;">
@@ -475,13 +474,12 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     <div class="table-wrap">
       <table class="data-table">
         <thead>
-          <!-- 게임 결과에 맞게 테이블 헤더 변경 -->
           <tr>
-            <th>날짜 및 시간</th><th>모드</th><th>단원명</th><th>학생 정보 / 팀</th><th>총 점수</th><th>맞춘 단어 수</th><th>진행 라운드</th><th>총 소요 시간</th>
+            <th>날짜 및 시간</th><th>모드</th><th>단원명</th><th>학생 정보 / 팀</th><th>총 점수</th><th>맞춘 단어 수</th><th>진행 라운드</th><th>총 소요 시간</th><th>관리</th>
           </tr>
         </thead>
         <tbody id="results-tbody">
-          <tr><td colspan="8" style="text-align:center; padding:30px;">데이터를 불러오는 중입니다...</td></tr>
+          <tr><td colspan="9" style="text-align:center; padding:30px;">데이터를 불러오는 중입니다...</td></tr>
         </tbody>
       </table>
     </div>
@@ -512,9 +510,9 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     <div class="table-wrap">
       <table class="data-table">
         <thead>
-          <tr><th style="color:var(--primary);">전체 등수</th><th>학년 등수</th><th>반 등수</th><th>점수 (타임보너스 포함)</th><th>이름 (소속 팀)</th><th>진행 모드</th><th>달성일</th></tr>
+          <tr><th style="color:var(--primary);">전체 등수</th><th>학년 등수</th><th>반 등수</th><th>점수 (타임보너스 포함)</th><th>이름 (소속 팀)</th><th>진행 모드</th><th>달성일</th><th>관리</th></tr>
         </thead>
-        <tbody id="leaderboard-tbody"><tr><td colspan="7" style="text-align:center; padding:30px;">기록을 불러오는 중입니다...</td></tr></tbody>
+        <tbody id="leaderboard-tbody"><tr><td colspan="8" style="text-align:center; padding:30px;">기록을 불러오는 중입니다...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -591,7 +589,6 @@ const settings = window.settings = window.settings || {};
 
 const MAX_DEFAULT = 6;
 const TEACHER_PWD = "0000";
-// 금기어 목록 (비속어 필터링)
 const BAD_WORDS = ['바보', '멍청이', '개새끼', '씨발', '병신', '지랄', '존나', '새끼', '미친', '좆', '시발', '썅', '죽어', '쓰레기'];
 
 let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [], teacherPwd: '0000' };
@@ -1417,7 +1414,7 @@ window.ui.refreshResultsTable = async () => {
     const gF = document.getElementById('res-grade-select').value;
     const cF = document.getElementById('res-class-select').value;
     
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">불러오는 중...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">불러오는 중...</td></tr>';
     
     const all = await window.settings.fetchResults();
     const filter = all.filter(r => {
@@ -1429,12 +1426,11 @@ window.ui.refreshResultsTable = async () => {
     });
 
     if (!filter.length) { 
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--color-text-secondary);">선택한 조건의 기록이 없습니다.</td></tr>'; 
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--color-text-secondary);">선택한 조건의 기록이 없습니다.</td></tr>'; 
         return; 
     }
     
     tbody.innerHTML = filter.map(r => {
-        // 호환성 처리 (이전 데이터는 점수나 라운드 수 없을 수 있음)
         let scoreText = r.score !== undefined ? `${r.score}점` : '-';
         let correctText = r.correctCount !== undefined ? `${r.correctCount}개 성공` : (r.correct === 'O' ? '성공' : '실패');
         let roundsText = r.totalRounds !== undefined ? `${r.totalRounds}라운드` : '-';
@@ -1449,6 +1445,7 @@ window.ui.refreshResultsTable = async () => {
             <td><span class="badge ${r.correctCount !== undefined ? 'o' : (r.correct==='O'?'o':'x')}">${correctText}</span></td>
             <td>${roundsText}</td>
             <td>${r.elapsed}초</td>
+            <td><button class="btn-ghost" style="padding: 4px 8px; font-size: 11px; color: var(--danger); border-color: #fca5a5;" onclick="window.settings.deleteSingleResult('${r.id}')">삭제</button></td>
         </tr>
     `}).join('');
 };
@@ -1494,7 +1491,6 @@ window.ui.updateLeaderboardTable = () => {
         return m;
     });
     
-    // 같은 플레이어의 중복 기록은 가장 높은 점수 1개만 남기기
     let bestScores = {};
     filter.forEach(r => {
         if (!bestScores[r.player] || bestScores[r.player].score < r.score) {
@@ -1505,7 +1501,7 @@ window.ui.updateLeaderboardTable = () => {
     filter = Object.values(bestScores).sort((a,b)=>b.score-a.score);
     
     if (!filter.length) { 
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--color-text-secondary);">해당 조건에 등록된 명예의 전당 기록이 없습니다.</td></tr>'; 
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--color-text-secondary);">해당 조건에 등록된 명예의 전당 기록이 없습니다.</td></tr>'; 
         return; 
     }
     
@@ -1530,6 +1526,7 @@ window.ui.updateLeaderboardTable = () => {
             <td style="font-weight:600;">${r.player}</td>
             <td><span style="font-size:11px; padding:3px 8px; border-radius:6px; background:#f1f5f9; color:var(--color-text-secondary);">${r.mode}</span></td>
             <td style="font-size:11px; color:var(--color-text-secondary);">${r.dateString}</td>
+            <td><button class="btn-ghost" style="padding: 4px 8px; font-size: 11px; color: var(--danger); border-color: #fca5a5;" onclick="window.settings.deleteLeaderboardResult('${r.id}')">삭제</button></td>
         </tr>
     `).join('');
 };
@@ -1617,7 +1614,6 @@ window.settings.saveSettings = async () => {
 window.settings.getResultsRef = () => !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_results') : collection(db, 'hangman_results');
 window.settings.getLeaderboardRef = () => !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_leaderboard') : collection(db, 'hangman_leaderboard');
 
-// 전체 게임 결과를 기록하도록 변경
 window.settings.logGameResultToCloud = async () => {
     if (!db || state.gameResultSaved) return;
     if (state.isMulti && !state.mode.startsWith('host')) return;
@@ -1694,11 +1690,36 @@ window.settings.fetchLeaderboardData = async () => {
     if (!db) return []; 
     const snap = await getDocs(window.settings.getLeaderboardRef()); 
     let res = []; 
-    snap.forEach(d => res.push(d.data())); 
+    snap.forEach(d => res.push({id: d.id, ...d.data()})); 
     return res; 
 };
 
-// --- 필터 초기화(삭제) 로직 ---
+window.settings.deleteSingleResult = async (id) => {
+    if (confirm("해당 학생(팀)의 기록을 정말 삭제하시겠습니까?")) {
+        try {
+            await deleteDoc(doc(db, window.settings.getResultsRef().path, id));
+            window.ui.refreshResultsTable();
+        } catch (e) {
+            alert("삭제 실패: " + e.message);
+        }
+    }
+};
+
+window.settings.deleteLeaderboardResult = async (id) => {
+    let pwd = prompt("기록을 삭제하려면 교사 암호를 입력하세요:", "");
+    if (pwd === (cfg.teacherPwd || "0000")) {
+        try {
+            await deleteDoc(doc(db, window.settings.getLeaderboardRef().path, id));
+            window.ui.cachedLeaderboardData = window.ui.cachedLeaderboardData.filter(r => r.id !== id);
+            window.ui.updateLeaderboardTable();
+        } catch (e) {
+            alert("삭제 실패: " + e.message);
+        }
+    } else if (pwd !== null) {
+        alert("암호가 일치하지 않습니다.");
+    }
+};
+
 window.settings.confirmResetResults = () => {
     const u = document.getElementById('res-unit-select').value; 
     const g = document.getElementById('res-grade-select').value; 
@@ -1711,7 +1732,7 @@ window.settings.confirmResetResults = () => {
 
 window.settings.performResetResults = async () => {
     document.getElementById('confirm-overlay').classList.remove('show');
-    document.getElementById('results-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--danger); font-weight:700;">데이터 삭제 중... 잠시만 기다려주세요.</td></tr>';
+    document.getElementById('results-tbody').innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--danger); font-weight:700;">데이터 삭제 중... 잠시만 기다려주세요.</td></tr>';
     
     const u = document.getElementById('res-unit-select').value; 
     const g = document.getElementById('res-grade-select').value; 
@@ -1722,7 +1743,6 @@ window.settings.performResetResults = async () => {
         const toDel = all.filter(r => {
             let m = true;
             if (u !== '전체') m = m && (r.unit === u);
-            // 과거 데이터 하위 호환 검사
             if (g !== 'All') m = m && (r.grade == g || (r.player && r.player.includes(g + '학년')));
             if (c !== 'All') m = m && (r.cls == c || (r.player && r.player.includes(c + '반')));
             return m;
@@ -1749,7 +1769,6 @@ window.settings.downloadCSV = async () => {
     const filter = all.filter(r => {
         let m = true;
         if (uF !== '전체') m = m && (r.unit === uF);
-        // 과거 데이터 하위 호환 검사
         if (gF !== 'All') m = m && (r.grade == gF || (r.player && r.player.includes(gF + '학년')));
         if (cF !== 'All') m = m && (r.cls == cF || (r.player && r.player.includes(cF + '반')));
         return m;
@@ -1772,7 +1791,6 @@ window.settings.downloadCSV = async () => {
     l.click();
 };
 
-// --- 앱 초기화 실행 ---
 window.settings.loadLocal();
 window.ui.renderUnits();
 

@@ -114,7 +114,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 }
 .mode-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
 .mode-card .icon { font-size: 36px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-.mode-card .text-wrap { flex: 1; }
 .mode-card .label { font-size: 15px; font-weight: 800; color: var(--color-text-primary); }
 .mode-card .desc { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; font-weight: 500;}
 
@@ -220,15 +219,13 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 @keyframes spin { to { transform: rotate(360deg); } }
 .room-code-display { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: 4px; text-align: center; margin: 15px 0; background: #e0e7ff; padding: 10px; border-radius: 12px; }
 
-/* BGM 컨트롤 (좌측 하단 플로팅) */
+/* BGM 컨트롤 */
 .bgm-container { position: fixed; bottom: 20px; left: 20px; z-index: 200; display: flex; align-items: center; gap: 8px; background: #ffffff; padding: 10px 16px; border-radius: 99px; box-shadow: var(--shadow-lg); border: 1px solid var(--color-border); transition: all 0.2s; }
 .bgm-container:hover { transform: translateY(-3px); border-color: var(--primary); }
 .bgm-btn { border: none; background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--color-text-secondary); transition: color 0.2s; padding: 0; outline: none; }
 .bgm-btn:hover { color: var(--primary); }
 .bgm-slider { width: 60px; height: 4px; border-radius: 2px; -webkit-appearance: none; background: #e2e8f0; outline: none; cursor: pointer; }
 .bgm-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); cursor: pointer; transition: transform 0.1s; }
-.bgm-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
-.bgm-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); cursor: pointer; border: none; }
 </style>
 </head>
 <body>
@@ -245,7 +242,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 <div id="app">
   <!-- 1. 홈 화면 -->
   <div id="screen-home" class="screen active">
-    <!-- 재접속 배너 -->
     <div id="rejoin-banner" class="rejoin-banner" style="display:none;">
       <div class="desc">진행 중인 게임이 있습니다!</div>
       <div class="btn-group">
@@ -258,7 +254,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <h1 style="font-family: monospace; font-size: 30px;">WORD HANGMAN RACE</h1>
       <p class="subtitle" style="font-size: 16px; color: var(--primary);">영어 단어 행맨 게임</p>
       
-      <!-- [1열] 게임 모드 선택 -->
       <div class="home-top-grid" style="margin-top: 2rem;">
         <div class="mode-card" onclick="window.ui.selectMode('solo')">
           <div class="icon">🎮</div>
@@ -283,7 +278,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
         </div>
       </div>
 
-      <!-- [2열] 방 참가 및 명예의 전당 -->
       <div class="home-bottom-grid">
         <div class="mode-card" onclick="window.ui.selectMode('guest')">
           <div class="icon">🚀</div>
@@ -301,7 +295,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
         </div>
       </div>
       
-      <!-- 교사 모드 버튼 -->
       <div style="border-top: 1px solid var(--color-border); margin: 2rem 0 1.5rem;"></div>
       <div style="text-align: center;">
         <button class="btn-ghost" style="padding: 0.6rem 1.8rem; border-radius: 99px; background: #ffffff; box-shadow: var(--shadow-sm);" onclick="window.settings.openPasswordModal()">
@@ -338,24 +331,18 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <h1 id="host-mode-title">멀티플레이 방 만들기</h1>
       <p class="subtitle">게임 모드와 참가 정보를 설정하세요</p>
       <div class="room-card">
-        
-        <!-- 단체전 팀 수 선택 (단체전일때만 보임) -->
         <div class="form-group" id="host-team-count-wrap" style="display:none;">
           <label>참가할 총 팀 수 (최대 10팀)</label>
           <select id="host-team-count">
-            <option value="2">2팀</option><option value="3">3팀</option><option value="4">4팀</option>
-            <option value="5">5팀</option><option value="6">6팀</option><option value="7">7팀</option>
-            <option value="8">8팀</option><option value="9">9팀</option><option value="10">10팀</option>
+            <option value="2">2팀</option><option value="3">3팀</option><option value="4">4팀</option><option value="5">5팀</option><option value="6">6팀</option><option value="7">7팀</option><option value="8">8팀</option><option value="9">9팀</option><option value="10">10팀</option>
           </select>
         </div>
-
         <div id="host-team-input">
           <div class="form-group">
             <label>우리 팀 이름 (호스트)</label>
             <input id="host-team-name" type="text" value="팀 1" maxlength="12"/>
           </div>
         </div>
-        
         <div id="host-1v1-input" style="display:none;">
           <div class="student-info-grid">
             <div class="form-group"><label>학년</label><select id="host-st-grade"><option value="">선택</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
@@ -366,10 +353,8 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
             <div class="form-group"><label>이름</label><input id="host-st-name" type="text" placeholder="이름 입력" maxlength="10"/></div>
           </div>
         </div>
-
         <button class="btn-primary" id="btn-create-room" onclick="window.net.createRoom()" style="margin-top:10px;">방 생성하기</button>
         <div id="host-err" style="font-size:12px; color:var(--danger); text-align:center; margin-top:8px; min-height:16px; font-weight:600;"></div>
-        
         <div id="host-waiting-area" style="display:none; text-align:center; margin-top:10px;">
           <div style="font-size:13px; color:var(--color-text-secondary); font-weight:600;">초대 코드</div>
           <div class="room-code-display" id="display-room-code">----</div>
@@ -387,7 +372,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <h1>방 참가하기</h1>
       <p class="subtitle">초대 코드를 입력하고 멀티플레이에 참가하세요</p>
       <div class="room-card">
-        
         <div id="guest-step1">
           <div class="form-group">
             <label>초대 코드 (4자리)</label>
@@ -395,17 +379,14 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
           </div>
           <button class="btn-primary" id="btn-check-code" onclick="window.net.checkRoomCode()">방 확인하기</button>
         </div>
-
         <div id="guest-step2" style="display:none;">
           <div style="font-size:13px; color:var(--primary); font-weight:700; margin-bottom:15px; text-align:center; background:#e0e7ff; padding:8px; border-radius:8px;" id="guest-room-info">방 정보 불러오는 중...</div>
-          
           <div id="guest-team-input" style="display:none;">
             <div class="form-group">
               <label>우리 팀 이름 (게스트)</label>
               <input id="guest-team-name" type="text" value="참가팀" maxlength="12"/>
             </div>
           </div>
-          
           <div id="guest-1v1-input" style="display:none;">
             <div class="student-info-grid">
               <div class="form-group"><label>학년</label><select id="guest-st-grade"><option value="">선택</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
@@ -416,12 +397,9 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
               <div class="form-group"><label>이름</label><input id="guest-st-name" type="text" placeholder="이름 입력" maxlength="10"/></div>
             </div>
           </div>
-          
           <button class="btn-primary" id="btn-join-room" onclick="window.net.joinRoom()">방 입장하기</button>
         </div>
-
         <div id="guest-err" style="font-size:12px; color:var(--danger); text-align:center; margin-top:8px; min-height:16px; font-weight:600;"></div>
-        
         <div id="guest-waiting-area" style="display:none; text-align:center; margin-top:10px;">
           <div style="font-size:14px; color:var(--success); font-weight:700; margin-bottom:10px;">✓ 방 입장 성공!</div>
           <div style="font-size:13px; color:var(--primary); font-weight:600;">모든 인원이 모이고 호스트가 시작할 때까지 대기해주세요...</div>
@@ -447,11 +425,8 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <div class="meta" id="game-meta"></div>
       <div class="turn-badge" id="turn-badge"></div>
     </div>
-    
     <div style="max-width:100%; width: 100%; margin:0 auto; flex:1; display:flex; flex-direction:column;">
-      <!-- 다중 팀 지원 반응형 점수판 -->
       <div class="score-grid" id="score-section" style="display:none;"></div>
-      
       <div class="game-layout">
         <div class="hangman-wrap">
           <svg class="hangman-svg" viewBox="0 0 140 160" id="hangman-svg"></svg>
@@ -471,7 +446,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     <h1>학생 게임 결과 기록표 (교사용)</h1>
     <p class="subtitle" style="margin-bottom: 15px;">게임 종료 시의 최종 게임 결과(총점 등)가 기록됩니다.</p>
     
-    <!-- 필터 및 제어 도구 (단원, 학년, 반 필터) -->
     <div style="display:flex; flex-wrap:wrap; gap:10px; background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; align-items:flex-end;">
        <div style="flex:1; min-width:150px;">
          <label style="font-size:11px; font-weight:700; color:var(--color-text-secondary);">단원 필터</label>
@@ -500,7 +474,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     <div class="table-wrap">
       <table class="data-table">
         <thead>
-          <!-- 게임 결과에 맞게 테이블 헤더 변경 -->
           <tr>
             <th>날짜 및 시간</th><th>모드</th><th>단원명</th><th>학생 정보 / 팀</th><th>총 점수</th><th>맞춘 단어 수</th><th>진행 라운드</th><th>총 소요 시간</th><th>관리</th>
           </tr>
@@ -544,7 +517,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 삭제 확인 모달 -->
   <div class="result-overlay" id="confirm-overlay">
     <div class="result-card" style="max-width: 350px;">
       <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
@@ -557,7 +529,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 교사 암호 모달 -->
   <div class="result-overlay" id="pwd-overlay">
     <div class="result-card" style="max-width: 300px;">
       <h3 style="margin-bottom:10px;">🔒 교사 모드</h3>
@@ -567,7 +538,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
 
-  <!-- 게임 결과 모달 -->
   <div class="result-overlay" id="result-overlay">
     <div class="result-card">
       <div id="result-emoji" style="font-size:48px;"></div>
@@ -587,7 +557,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <div class="copyright">Copyright © 2026 Eui Elementary School. All Rights Reserved.</div>
 </div>
 
-<!-- 교사 설정 패널 -->
 <div class="teacher-panel" id="teacher-panel">
   <div class="panel-title">교사 관리 패널<button class="btn-ghost" style="padding:2px 8px; font-size:12px; border:none;" onclick="document.getElementById('teacher-panel').classList.remove('open')">✕ 닫기</button></div>
   <button class="panel-btn sec" onclick="window.ui.showResults()">📊 학생 게임 기록표 (전체 결과)</button>
@@ -608,13 +577,11 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
   <div class="panel-status" id="panel-status"></div>
 </div>
 
-<!-- Firebase & 게임 로직 스크립트 -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// --- 오브젝트 전역 바인딩 (이벤트 리스너용) ---
 const ui = window.ui = window.ui || {};
 const net = window.net = window.net || {};
 const game = window.game = window.game || {};
@@ -622,7 +589,6 @@ const settings = window.settings = window.settings || {};
 
 const MAX_DEFAULT = 6;
 const TEACHER_PWD = "0000";
-// 금기어 목록 (비속어 필터링)
 const BAD_WORDS = ['바보', '멍청이', '개새끼', '씨발', '병신', '지랄', '존나', '새끼', '미친', '좆', '시발', '썅', '죽어', '쓰레기'];
 
 let cfg = { maxWrong: MAX_DEFAULT, hint: 'korean', customUnits: [], teacherPwd: '0000' };
@@ -648,7 +614,6 @@ let state = {
     gameResultSaved: false
 };
 
-// --- BGM 제어 ---
 let isBgmOn = false;
 
 window.ui.toggleBGM = () => {
@@ -697,7 +662,6 @@ window.ui.hasBadWord = (text) => {
     return BAD_WORDS.some(word => text.includes(word));
 };
 
-// --- 키보드 이벤트 바인딩 ---
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
     if (document.getElementById('pwd-overlay').classList.contains('show')) return;
@@ -720,7 +684,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// --- Firebase 초기화 ---
 let app, auth, db, user, appId, unsubscribeRoom = null;
 let isExternalEnv = false;
 
@@ -740,10 +703,7 @@ const initFirebase = async () => {
                 appId: "1:434551215608:web:89ff7a794553676128320d"
             };
 
-            if (myFirebaseConfig.apiKey === "YOUR_API_KEY") {
-                console.warn("개인 Firebase 설정이 없습니다.");
-                return; 
-            }
+            if (myFirebaseConfig.apiKey === "YOUR_API_KEY") { return; }
             appId = 'github-hosted-app';
             app = initializeApp(myFirebaseConfig);
         }
@@ -774,16 +734,13 @@ const initFirebase = async () => {
                     state.sync.hintMode = cfg.hint || 'korean';
                 }
             }
-        } catch(e) { console.error("설정 로드 에러:", e); }
+        } catch(e) {}
         
         window.ui.checkRejoin();
-    } catch(e) {
-        console.error("Firebase 초기화 에러:", e);
-    }
+    } catch(e) {}
 };
 initFirebase();
 
-// --- 네트워크 방 로직 ---
 window.net.getRoomRef = (roomId) => {
     return !isExternalEnv ? doc(db, 'artifacts', appId, 'public', 'data', 'hangman_rooms', roomId) : doc(db, 'hangman_rooms', roomId);
 };
@@ -846,7 +803,6 @@ window.net.createRoom = async () => {
         window.ui.saveRejoinData(); 
         window.net.listenRoom(roomId);
     } catch (e) {
-        console.error(e);
         errEl.textContent = "방 생성 실패. 권한 오류나 일시적 문제일 수 있습니다.";
         btn.disabled = false; btn.textContent = '방 생성하기';
     }
@@ -888,7 +844,6 @@ window.net.checkRoomCode = async () => {
         document.getElementById('guest-1v1-input').style.display = roomData.multiType === '1v1' ? 'block' : 'none';
 
     } catch(e) {
-        console.error(e);
         btn.disabled = false; errEl.textContent = "오류가 발생했습니다: " + e.message;
     }
 };
@@ -951,7 +906,6 @@ window.net.joinRoom = async () => {
         window.ui.saveRejoinData();
         window.net.listenRoom(roomId);
     } catch (e) {
-        console.error(e);
         btn.disabled = false; errEl.textContent = "입장 중 오류 발생: " + e.message;
     }
 };
@@ -1000,7 +954,7 @@ window.net.listenRoom = (roomId) => {
         else if (state.sync.status === 'finished') {
             window.game.showFinalResultUI();
         }
-    }, (error) => { console.error("Firestore listen error:", error); });
+    });
 };
   
 window.net.pushState = async () => {
@@ -1022,7 +976,6 @@ window.net.rejoinRoom = () => {
     }
 };
 
-// --- 게임 핵심 로직 ---
 window.game.getAllWords = () => { 
     let a = []; 
     getActiveUnits().forEach(u => a = a.concat(u.words)); 
@@ -1070,7 +1023,7 @@ window.game.initNextRound = async () => {
     state.sync.roundNum++;
     state.sync.status = 'playing';
     
-    state.startTime = Date.now(); // 라운드 시간
+    state.startTime = Date.now();
     
     if (state.isMulti) await window.net.pushState(); else { window.game.renderAll(); document.getElementById('result-overlay').classList.remove('show'); }
 };
@@ -1189,7 +1142,7 @@ window.game.renderHangman = () => {
         `<line x1="100" y1="95" x2="120" y2="120" stroke="${errorColor}" stroke-width="4" stroke-linecap="round"/>`
     ];
     let html = ''; 
-    for (let i = 0; i < 4; i++) html += p[i]; // 기본 구조물
+    for (let i = 0; i < 4; i++) html += p[i];
     
     const maxW = state.sync.maxWrong || 6;
     let partsToShow = 0;
@@ -1339,7 +1292,6 @@ window.game.showFinalResultUI = async () => {
     window.ui.clearRejoin(false); 
 };
 
-// --- UI Methods ---
 window.ui.showScreen = (id) => { 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
@@ -1541,21 +1493,19 @@ window.ui.updateLeaderboardTable = () => {
     
     let bestScores = {};
     filter.forEach(r => {
-        // 단체전이나 개인전(팀명) 등, 학생 개인 번호가 없는 경우는 그대로 표시
-        // 번호가 있는 학생 개인전/솔로 기록에 대해서만 "이름"을 "번호"로 마스킹하여 키값 생성 및 노출
         let displayPlayerName = r.player;
         if (r.mode === '1인 플레이' || r.mode === '1:1 개인전') {
-           // 보통 "O학년 O반 O번 이름" 형태로 저장됨
-           // 정규식을 사용해 이름 부분을 제외하고 학년, 반, 번호만 추출
-           const match = r.player.match(/(\d+학년\s+\d+반\s+\d+번)/);
-           if (match) {
-               displayPlayerName = match[1];
+           if (r.grade && r.cls && r.num) {
+               displayPlayerName = `${r.grade}학년 ${r.cls}반 ${r.num}번`;
+           } else {
+               const match = r.player.match(/(\d+학년\s+\d+반\s+\d+번)/);
+               if (match) {
+                   displayPlayerName = match[1];
+               }
            }
         }
 
-        // 중복 기록 방지: 표시되는 이름 기준으로 최고 점수 1개만 저장
         if (!bestScores[displayPlayerName] || bestScores[displayPlayerName].score < r.score) {
-            // 복사본을 만들어 표시용 이름을 저장
             bestScores[displayPlayerName] = { ...r, displayPlayerName: displayPlayerName };
         }
     });
@@ -1710,7 +1660,8 @@ window.settings.logGameResultToCloud = async () => {
             totalRounds: state.sync.roundNum,
             elapsed: elapsed, 
             grade: state.student.grade || "", 
-            cls: state.student.cls || "" 
+            cls: state.student.cls || "",
+            num: state.student.num || "" 
         }); 
     } catch(err) { console.error(err); }
 };
@@ -1735,7 +1686,8 @@ window.settings.saveLeaderboardScore = async () => {
             player: p, 
             score: s, 
             grade: state.student.grade || "", 
-            cls: state.student.cls || "" 
+            cls: state.student.cls || "",
+            num: state.student.num || "" 
         }); 
     } catch(err) { console.error(err); }
 };

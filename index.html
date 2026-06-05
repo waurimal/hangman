@@ -101,7 +101,7 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
 
 /* 메인 화면 1열, 2열 분리 그리드 */
 .home-top-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 600px; margin: 0 auto; }
-.home-bottom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 600px; margin: 12px auto 0; }
+.home-bottom-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px; width: 100%; max-width: 400px; margin: 12px auto 0; }
 @media (max-width: 550px) {
   .home-top-grid { grid-template-columns: 1fr; }
   .home-bottom-grid { grid-template-columns: 1fr; }
@@ -284,13 +284,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
           <div class="text-wrap">
             <div class="label">방 참가하기</div>
             <div class="desc">초대 코드로 게임 입장</div>
-          </div>
-        </div>
-        <div class="mode-card" onclick="window.ui.showStudentLeaderboard()" style="border-color: #f59e0b; background: #fffbeb;">
-          <div class="icon">🏆</div>
-          <div class="text-wrap">
-            <div class="label" style="color: #b45309;">명예의 전당</div>
-            <div class="desc">최고 기록과 랭킹 순위</div>
           </div>
         </div>
       </div>
@@ -485,38 +478,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
     </div>
   </div>
   
-  <!-- 8. 학생용 명예의 전당 -->
-  <div id="screen-leaderboard" class="screen">
-    <h1>🏆 명예의 전당</h1>
-    <p class="subtitle" style="margin-bottom: 15px; color: var(--primary);">단원별/모드별 최고 점수와 랭킹을 확인하세요!</p>
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center; gap: 10px; flex-wrap:wrap;">
-      <button class="btn-ghost" onclick="window.ui.goHome()" style="flex-shrink:0;">← 홈으로</button>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <select id="lb-mode-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()">
-          <option value="1인 플레이">1인 플레이</option><option value="1:1 개인전">1:1 개인전</option><option value="단체전">단체전</option>
-        </select>
-        <select id="lb-unit-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()"></select>
-        
-        <select id="lb-grade-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()">
-          <option value="All">전체 학년</option>
-          <option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option>
-        </select>
-        <select id="lb-class-select" class="panel-select" style="width: auto; padding: 0.5rem; font-weight:600;" onchange="window.ui.updateLeaderboardTable()">
-          <option value="All">전체 반</option>
-          <option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option><option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option>
-        </select>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr><th style="color:var(--primary);">전체 등수</th><th>학년 등수</th><th>반 등수</th><th>점수 (타임보너스 포함)</th><th>학생 정보 (팀명)</th><th>진행 모드</th><th>달성일</th><th>관리</th></tr>
-        </thead>
-        <tbody id="leaderboard-tbody"><tr><td colspan="8" style="text-align:center; padding:30px;">명예의 전당 기록을 불러오는 중입니다...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
   <div class="result-overlay" id="confirm-overlay">
     <div class="result-card" style="max-width: 350px;">
       <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
@@ -545,7 +506,6 @@ h1 { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 0.25r
       <div id="result-msg" class="result-msg"></div>
       <div id="sheet-save-status" style="font-size:12px; color:var(--primary); margin-bottom:12px;"></div>
       <button class="btn-primary" onclick="window.game.nextRound()" id="next-btn">다음 단어 →</button>
-      <button class="btn-primary" onclick="window.ui.showStudentLeaderboard()" id="leaderboard-btn" style="display:none; background:#f59e0b;">🏆 명예의 전당</button>
       <div id="waiting-next-msg" style="display:none; margin-bottom: 15px; color: var(--primary); font-weight: 600;">대기중...</div>
       <button class="btn-ghost" onclick="window.ui.exitGame()">게임 완전히 끝내기</button>
     </div>
@@ -1216,10 +1176,7 @@ window.game.showResultUI = (localWonFlag) => {
     const remaining = state.sync.wordPool.filter(w => !state.sync.usedWords.includes(w.w)).length;
     const nextBtn = document.getElementById('next-btn');
     const waitingMsg = document.getElementById('waiting-next-msg');
-    const leaderboardBtn = document.getElementById('leaderboard-btn');
     
-    leaderboardBtn.style.display = 'none';
-
     if (state.isMulti) {
         if (state.mode.startsWith('host')) { 
             nextBtn.style.display = 'block';
@@ -1281,13 +1238,11 @@ window.game.showFinalResultUI = async () => {
     document.getElementById('result-msg').innerHTML = msg;
     document.getElementById('next-btn').style.display = 'none';
     document.getElementById('waiting-next-msg').style.display = 'none';
-    document.getElementById('sheet-save-status').textContent = '최종 점수를 명예의 전당에 등록 중...';
+    document.getElementById('sheet-save-status').textContent = '최종 점수를 기록 중입니다...';
     
-    await window.settings.saveLeaderboardScore();
     await window.settings.logGameResultToCloud();
     
-    document.getElementById('sheet-save-status').textContent = '✓ 명예의 전당에 점수 기록 완료!';
-    document.getElementById('leaderboard-btn').style.display = 'block';
+    document.getElementById('sheet-save-status').textContent = '✓ 기록 완료!';
 
     window.ui.clearRejoin(false); 
 };
@@ -1296,7 +1251,7 @@ window.ui.showScreen = (id) => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
     
-    if (id === 'screen-results' || id === 'screen-game' || id === 'screen-leaderboard') document.getElementById('app').classList.add('wide-mode');
+    if (id === 'screen-results' || id === 'screen-game') document.getElementById('app').classList.add('wide-mode');
     else document.getElementById('app').classList.remove('wide-mode');
 };
   
@@ -1331,7 +1286,6 @@ window.ui.goHome = () => {
   
 window.ui.exitGame = async () => {
     if (confirm("정말 게임에서 나가시겠습니까? (현재까지의 전체 결과가 기록됩니다.)")) {
-        await window.settings.saveLeaderboardScore();
         await window.settings.logGameResultToCloud();
         window.ui.clearRejoin(true);
         window.ui.goHome();
@@ -1460,89 +1414,6 @@ window.ui.showResults = async () => {
     window.ui.refreshResultsTable();
 };
 
-window.ui.cachedLeaderboardData = [];
-window.ui.showStudentLeaderboard = async () => {
-    window.ui.goHome(); 
-    window.ui.showScreen('screen-leaderboard');
-    
-    const sel = document.getElementById('lb-unit-select'); 
-    sel.innerHTML = '<option value="전체 단어 섞기">전체 단어 섞기</option>' + getActiveUnits().map(u=>`<option value="${u.title}">${u.title}</option>`).join('');
-    document.getElementById('lb-mode-select').value = '1인 플레이';
-    document.getElementById('lb-grade-select').value = 'All';
-    document.getElementById('lb-class-select').value = 'All';
-    
-    window.ui.cachedLeaderboardData = await window.settings.fetchLeaderboardData(); 
-    window.ui.updateLeaderboardTable();
-};
-
-window.ui.updateLeaderboardTable = () => {
-    const uF = document.getElementById('lb-unit-select').value;
-    const mF = document.getElementById('lb-mode-select').value;
-    const gF = document.getElementById('lb-grade-select').value;
-    const cF = document.getElementById('lb-class-select').value;
-    const tbody = document.getElementById('leaderboard-tbody');
-    
-    let filter = window.ui.cachedLeaderboardData.filter(r => {
-        let m = true;
-        if (r.unit !== uF) m = false;
-        if (r.mode !== mF) m = false;
-        if (gF !== 'All' && r.grade != gF && !(r.player && r.player.includes(gF + '학년'))) m = false;
-        if (cF !== 'All' && r.cls != cF && !(r.player && r.player.includes(cF + '반'))) m = false;
-        return m;
-    });
-    
-    let bestScores = {};
-    filter.forEach(r => {
-        let displayPlayerName = r.player;
-        if (r.mode === '1인 플레이' || r.mode === '1:1 개인전') {
-           if (r.grade && r.cls && r.num) {
-               displayPlayerName = `${r.grade}학년 ${r.cls}반 ${r.num}번`;
-           } else {
-               const match = r.player.match(/(\d+학년\s+\d+반\s+\d+번)/);
-               if (match) {
-                   displayPlayerName = match[1];
-               }
-           }
-        }
-
-        if (!bestScores[displayPlayerName] || bestScores[displayPlayerName].score < r.score) {
-            bestScores[displayPlayerName] = { ...r, displayPlayerName: displayPlayerName };
-        }
-    });
-    
-    filter = Object.values(bestScores).sort((a,b)=>b.score-a.score);
-    
-    if (!filter.length) { 
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--color-text-secondary);">해당 조건에 등록된 명예의 전당 기록이 없습니다.</td></tr>'; 
-        return; 
-    }
-    
-    filter.forEach((r, i) => { 
-        r.overallRank = i + 1; 
-        if (r.grade) {
-            r.gradeRank = filter.filter(x=>x.grade===r.grade && x.score > r.score).length+1; 
-        }
-        if (r.grade && r.cls) {
-            r.classRank = filter.filter(x=>x.grade===r.grade && x.cls===r.cls && x.score > r.score).length+1; 
-        }
-    });
-    
-    tbody.innerHTML = filter.map(r => `
-        <tr>
-            <td style="font-weight:800; color:var(--primary); font-size:14px;">
-                ${r.overallRank<=3 ? ['🥇','🥈','🥉'][r.overallRank-1] : ''} ${r.overallRank}위
-            </td>
-            <td style="font-weight:600; color:var(--color-text-secondary);">${r.gradeRank ? r.gradeRank+'위' : '-'}</td>
-            <td style="font-weight:600; color:var(--color-text-secondary);">${r.classRank ? r.classRank+'위' : '-'}</td>
-            <td style="font-weight:800; font-size:15px; color:#d97706;">${r.score}점</td>
-            <td style="font-weight:600;">${r.displayPlayerName}</td>
-            <td><span style="font-size:11px; padding:3px 8px; border-radius:6px; background:#f1f5f9; color:var(--color-text-secondary);">${r.mode}</span></td>
-            <td style="font-size:11px; color:var(--color-text-secondary);">${r.dateString}</td>
-            <td><button class="btn-ghost" style="padding: 4px 8px; font-size: 11px; color: var(--danger); border-color: #fca5a5;" onclick="window.settings.deleteLeaderboardResult('${r.id}')">삭제</button></td>
-        </tr>
-    `).join('');
-};
-
 window.settings.openPasswordModal = () => { 
     document.getElementById('teacher-pwd').value = ''; 
     document.getElementById('pwd-overlay').classList.add('show'); 
@@ -1624,7 +1495,6 @@ window.settings.saveSettings = async () => {
 };
 
 window.settings.getResultsRef = () => !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_results') : collection(db, 'hangman_results');
-window.settings.getLeaderboardRef = () => !isExternalEnv ? collection(db, 'artifacts', appId, 'public', 'data', 'hangman_leaderboard') : collection(db, 'hangman_leaderboard');
 
 window.settings.logGameResultToCloud = async () => {
     if (!db || state.gameResultSaved) return;
@@ -1666,46 +1536,12 @@ window.settings.logGameResultToCloud = async () => {
     } catch(err) { console.error(err); }
 };
 
-window.settings.saveLeaderboardScore = async () => {
-    if (!db || state.scoreSaved) return;
-    let s = state.isMulti ? state.sync.scores[state.myTeamIdx] : state.sync.scores[0]; 
-    if (s <= 0) return;
-    
-    state.scoreSaved = true;
-    
-    let modeName = state.mode.includes('team') ? '단체전' : (state.mode.includes('1v1') ? '1:1 개인전' : '1인 플레이');
-    let u = state.sync.unit === -1 ? "전체 단어 섞기" : getActiveUnits()[state.sync.unit].title;
-    let p = state.isMulti ? state.sync.teams[state.myTeamIdx] : `${state.student.grade}학년 ${state.student.cls}반 ${state.student.num}번 ${state.student.name}`;
-
-    try { 
-        await addDoc(window.settings.getLeaderboardRef(), { 
-            timestamp: Date.now(), 
-            dateString: new Date().toLocaleString(), 
-            mode: modeName, 
-            unit: u, 
-            player: p, 
-            score: s, 
-            grade: state.student.grade || "", 
-            cls: state.student.cls || "",
-            num: state.student.num || "" 
-        }); 
-    } catch(err) { console.error(err); }
-};
-
 window.settings.fetchResults = async () => { 
     if (!db) return []; 
     const snap = await getDocs(window.settings.getResultsRef()); 
     let res = []; 
     snap.forEach(d => res.push({id: d.id, ...d.data()})); 
     return res.sort((a,b) => b.timestamp - a.timestamp); 
-};
-
-window.settings.fetchLeaderboardData = async () => { 
-    if (!db) return []; 
-    const snap = await getDocs(window.settings.getLeaderboardRef()); 
-    let res = []; 
-    snap.forEach(d => res.push({id: d.id, ...d.data()})); 
-    return res; 
 };
 
 window.settings.deleteSingleResult = async (id) => {
@@ -1716,21 +1552,6 @@ window.settings.deleteSingleResult = async (id) => {
         } catch (e) {
             alert("삭제 실패: " + e.message);
         }
-    }
-};
-
-window.settings.deleteLeaderboardResult = async (id) => {
-    let pwd = prompt("기록을 삭제하려면 교사 암호를 입력하세요:", "");
-    if (pwd === (cfg.teacherPwd || "0000")) {
-        try {
-            await deleteDoc(doc(db, window.settings.getLeaderboardRef().path, id));
-            window.ui.cachedLeaderboardData = window.ui.cachedLeaderboardData.filter(r => r.id !== id);
-            window.ui.updateLeaderboardTable();
-        } catch (e) {
-            alert("삭제 실패: " + e.message);
-        }
-    } else if (pwd !== null) {
-        alert("암호가 일치하지 않습니다.");
     }
 };
 

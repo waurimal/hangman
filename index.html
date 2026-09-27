@@ -3364,15 +3364,16 @@ window.settings.closePasswordModal = () => {
 window.settings.checkPassword = () => {
     const inputPw = document.getElementById('teacher-pwd').value.trim();
     const realPw = (cfg.teacherPwd || DEFAULT_TEACHER_PWD).trim();
+    const waurimalPw = localStorage.getItem('waurimal_admin_pw');
 
-    // 0000 또는 1234 또는 설정된 비번 모두 허용하여 편리성 보장
-    if (inputPw === realPw || inputPw === "0000" || inputPw === "1234") {
+    // 0000 또는 1234 또는 설정된 비번 또는 공통 비번 모두 허용하여 편리성 보장
+    if (inputPw === realPw || inputPw === "0000" || inputPw === "1234" || (waurimalPw && inputPw === waurimalPw)) {
         window.settings.closePasswordModal();
         window.settings.applyToPanel();
         window.ui.showScreen('screen-teacher');
         window.ui.refreshResultsTable();
     } else {
-        alert("비밀번호가 일치하지 않습니다. (기본: 0000)");
+        alert("비밀번호가 일치하지 않습니다. (기본: 0000 또는 1234)");
         document.getElementById('teacher-pwd').value = '';
     }
 };
@@ -3416,6 +3417,7 @@ window.settings.saveSettings = async () => {
     window.settings.readFromPanel();
     try {
         localStorage.setItem('hangman_cfg', JSON.stringify(cfg));
+        if (cfg.teacherPwd) localStorage.setItem('waurimal_admin_pw', cfg.teacherPwd);
     } catch (e) {}
 
     window.ui.renderUnits();

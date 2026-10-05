@@ -2251,6 +2251,12 @@ function getMergedUnits() {
 
 // ── 화면 전환 제어 ──
 window.ui.showScreen = (id) => {
+    if (id === 'screen-teacher') {
+        if (!window.WaurimalAuth || !window.WaurimalAuth.isAuthenticated()) {
+            window.settings.openPasswordModal();
+            return;
+        }
+    }
     document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
     const target = document.getElementById(id);
     if (target) {
@@ -3326,20 +3332,24 @@ function renderLeaderboard() {
         const rank = idx + 1;
         const topClass = rank === 1 ? 'top-1' : (rank === 2 ? 'top-2' : (rank === 3 ? 'top-3' : ''));
         const rankDisplay = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : rank));
-        const masked = item.name ? maskName(item.name) : maskName(item.player);
+        const rawMasked = item.name ? maskName(item.name) : maskName(item.player);
         const g = item.grade ? `${item.grade}` : '';
         const c = item.cls || item.class ? `${item.cls || item.class}` : '';
         const gradeClassLabel = (g && c) ? `${g}-${c}반` : (g ? `${g}학년` : (c ? `${c}반` : ''));
         const scoreFormatted = Number(item.score || 0).toLocaleString();
 
+        const safeMasked = window.WaurimalSanitize ? window.WaurimalSanitize(rawMasked) : rawMasked;
+        const safeInfo = window.WaurimalSanitize ? window.WaurimalSanitize(gradeClassLabel) : gradeClassLabel;
+        const safeUnit = window.WaurimalSanitize ? window.WaurimalSanitize(item.unit || '-') : (item.unit || '-');
+
         return `
             <div class="hof-item ${topClass}">
                 <div class="hof-rank-box">${rankDisplay}</div>
                 <div class="hof-user-box">
-                    <span class="hof-user-name">${masked}</span>
-                    ${gradeClassLabel ? `<span class="hof-user-info">${gradeClassLabel}</span>` : ''}
+                    <span class="hof-user-name">${safeMasked}</span>
+                    ${safeInfo ? `<span class="hof-user-info">${safeInfo}</span>` : ''}
                 </div>
-                <span class="hof-lesson-badge" title="${item.unit || '-'}">${item.unit || '-'}</span>
+                <span class="hof-lesson-badge" title="${safeUnit}">${safeUnit}</span>
                 <div class="hof-score-box">
                     <span class="hof-score-val">${scoreFormatted}점</span>
                     <span class="hof-time-val">⏱️ ${item.elapsed || 0}초</span>
@@ -3351,6 +3361,12 @@ function renderLeaderboard() {
 
 // ── 2. 교사용 관리 페이지 진입 및 제어 ──
 window.settings.openPasswordModal = () => {
+    if (window.WaurimalAuth && window.WaurimalAuth.isAuthenticated()) {
+        window.settings.applyToPanel();
+        window.ui.showScreen('screen-teacher');
+        window.ui.refreshResultsTable();
+        return;
+    }
     document.getElementById('teacher-pwd').value = '';
     document.getElementById('pwd-overlay').classList.add('show');
     setTimeout(() => document.getElementById('teacher-pwd').focus(), 150);
@@ -3364,16 +3380,15 @@ window.settings.closePasswordModal = () => {
 window.settings.checkPassword = () => {
     const inputPw = document.getElementById('teacher-pwd').value.trim();
     const realPw = (cfg.teacherPwd || DEFAULT_TEACHER_PWD).trim();
-    const waurimalPw = localStorage.getItem('waurimal_admin_pw');
+    const authOk = window.WaurimalAuth ? window.WaurimalAuth.authenticate(inputPw) : (inputPw === realPw || inputPw === (localStorage.getItem('waurimal_admin_pw') || "1234"));
 
-    // 0000 또는 1234 또는 설정된 비번 또는 공통 비번 모두 허용하여 편리성 보장
-    if (inputPw === realPw || inputPw === "0000" || inputPw === "1234" || (waurimalPw && inputPw === waurimalPw)) {
+    if (authOk) {
         window.settings.closePasswordModal();
         window.settings.applyToPanel();
         window.ui.showScreen('screen-teacher');
         window.ui.refreshResultsTable();
     } else {
-        alert("비밀번호가 일치하지 않습니다. (기본: 0000 또는 1234)");
+        alert("비밀번호가 일치하지 않습니다.");
         document.getElementById('teacher-pwd').value = '';
     }
 };
@@ -3417,7 +3432,13 @@ window.settings.saveSettings = async () => {
     window.settings.readFromPanel();
     try {
         localStorage.setItem('hangman_cfg', JSON.stringify(cfg));
-        if (cfg.teacherPwd) localStorage.setItem('waurimal_admin_pw', cfg.teacherPwd);
+        if (cfg.teacherPwd) {
+            if (window.WaurimalAuth) {
+                window.WaurimalAuth.setPw(cfg.teacherPwd);
+            } else {
+                localStorage.setItem('waurimal_admin_pw', cfg.teacherPwd);
+            }
+        }
     } catch (e) {}
 
     window.ui.renderUnits();
@@ -3481,19 +3502,25 @@ window.ui.refreshResultsTable = () => {
         return;
     }
 
-    tbody.innerHTML = filtered.map(r => `
+    tbody.innerHTML = filtered.map(r => {
+        const safeDate = window.WaurimalSanitize ? window.WaurimalSanitize(r.dateString || '-') : (r.dateString || '-');
+        const safeMode = window.WaurimalSanitize ? window.WaurimalSanitize(r.mode || '1인') : (r.mode || '1인');
+        const safeUnit = window.WaurimalSanitize ? window.WaurimalSanitize(r.unit || '-') : (r.unit || '-');
+        const safePlayer = window.WaurimalSanitize ? window.WaurimalSanitize(r.player || '-') : (r.player || '-');
+        return `
         <tr>
-            <td style="font-size:0.8rem; color:var(--text-sub);">${r.dateString || '-'}</td>
-            <td><span style="font-size:0.75rem; font-weight:700; padding:2px 8px; background:#F1F5F9; border-radius:6px;">${r.mode || '1인'}</span></td>
-            <td><b>${r.unit || '-'}</b></td>
-            <td style="font-weight:700; color:var(--primary);">${r.player || '-'}</td>
+            <td style="font-size:0.8rem; color:var(--text-sub);">${safeDate}</td>
+            <td><span style="font-size:0.75rem; font-weight:700; padding:2px 8px; background:#F1F5F9; border-radius:6px;">${safeMode}</span></td>
+            <td><b>${safeUnit}</b></td>
+            <td style="font-weight:700; color:var(--primary);">${safePlayer}</td>
             <td style="font-weight:800; color:var(--teacher);">${(r.score !== undefined) ? r.score + '점' : '-'}</td>
             <td><span style="font-weight:700; color:var(--success);">${r.correctCount || 0}개 성공</span></td>
             <td>${r.totalRounds || '-'}라운드</td>
             <td>${r.elapsed || 0}초</td>
             <td><button type="button" class="btn btn-ghost" style="padding:2px 8px; font-size:0.75rem; color:var(--danger); border-color:#FECACA;" onclick="window.settings.deleteSingleResult('${r.id}')">삭제</button></td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 };
 
 window.settings.deleteSingleResult = async (id) => {

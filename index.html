@@ -3328,8 +3328,9 @@ function renderLeaderboard() {
     }
 
     const top20 = uniqueStudents.slice(0, 20);
-    listEl.innerHTML = top20.map((item, idx) => {
-        const rank = idx + 1;
+    listEl.innerHTML = top20.map((item, idx, arr) => {
+        // 동점자 동일 순위 및 차순위 건너뛰기 (1등 2명이면 1등, 1등, 3등)
+        const rank = arr.findIndex(x => Number(x.score || 0) <= Number(item.score || 0)) + 1;
         const topClass = rank === 1 ? 'top-1' : (rank === 2 ? 'top-2' : (rank === 3 ? 'top-3' : ''));
         const rankDisplay = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : rank));
         const rawMasked = item.name ? maskName(item.name) : maskName(item.player);

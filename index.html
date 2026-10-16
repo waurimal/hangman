@@ -2019,7 +2019,7 @@ const game = window.game = window.game || {};
 const settings = window.settings = window.settings || {};
 
 const MAX_DEFAULT = 6;
-const DEFAULT_TEACHER_PWD = "0000";
+const DEFAULT_TEACHER_PWD = "4657";
 
 let cfg = {
     maxWrong: MAX_DEFAULT,
@@ -3381,7 +3381,7 @@ window.settings.closePasswordModal = () => {
 window.settings.checkPassword = () => {
     const inputPw = document.getElementById('teacher-pwd').value.trim();
     const realPw = (cfg.teacherPwd || DEFAULT_TEACHER_PWD).trim();
-    const authOk = window.WaurimalAuth ? window.WaurimalAuth.authenticate(inputPw) : (inputPw === realPw || inputPw === (localStorage.getItem('waurimal_admin_pw') || "1234"));
+    const authOk = window.WaurimalAuth ? window.WaurimalAuth.authenticate(inputPw) : (inputPw === realPw || inputPw === (localStorage.getItem('waurimal_admin_pw') || "4657"));
 
     if (authOk) {
         window.settings.closePasswordModal();
